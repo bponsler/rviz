@@ -58,6 +58,7 @@ RobotModelDisplay::RobotModelDisplay()
   : Display()
   , has_new_transforms_( false )
   , time_since_last_transform_( 0.0f )
+  , time_since_last_reload_( 0.0f )
 {
   visual_enabled_property_ = new Property( "Visual Enabled", true,
                                            "Whether to display the visual representation of the robot.",
@@ -72,6 +73,14 @@ RobotModelDisplay::RobotModelDisplay()
                                              " 0 means to update every update cycle.",
                                              this );
   update_rate_property_->setMin( 0 );
+
+  reload_rate_property_ = new FloatProperty( "Reload Model Interval", 0,
+                                             "Interval at which to reload the robot description, in seconds. "
+                                             " 0 means to update every update cycle. -1 means to never "
+                                             "reload the robot description.",
+                                             this );
+  reload_rate_property_->setMin( -1 );
+  reload_rate_property_->setValue( -1 );  // Default is not to reload the model
 
   alpha_property_ = new FloatProperty( "Alpha", 1,
                                        "Amount of transparency to apply to the links.",
@@ -211,6 +220,22 @@ void RobotModelDisplay::onDisable()
 
 void RobotModelDisplay::update( float wall_dt, float ros_dt )
 {
+  // Handle reloading the model at a specified interval
+  float reloadRate = reload_rate_property_->getFloat();
+  if (reloadRate >= 0)  // Negative rate means to never reload the model
+  {
+    time_since_last_reload_ += wall_dt;
+    bool reloadModel = reloadRate < 0.0001f || time_since_last_reload_ >= reloadRate;
+
+    if( reloadModel )
+    {
+      updateRobotDescription();
+
+      has_new_transforms_ = true;
+      time_since_last_reload_ = 0.0f;
+    }
+  }
+
   time_since_last_transform_ += wall_dt;
   float rate = update_rate_property_->getFloat();
   bool update = rate < 0.0001f || time_since_last_transform_ >= rate;

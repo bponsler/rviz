@@ -96,12 +96,14 @@ protected:
   bool has_new_transforms_;      ///< Callback sets this to tell our update function it needs to update the transforms
 
   float time_since_last_transform_;
+  float time_since_last_reload_;
 
   std::string robot_description_;
 
   Property* visual_enabled_property_;
   Property* collision_enabled_property_;
   FloatProperty* update_rate_property_;
+  FloatProperty* reload_rate_property_;
   StringProperty* robot_description_property_;
   FloatProperty* alpha_property_;
   StringProperty* tf_prefix_property_;
@@ -110,4 +112,3 @@ protected:
 } // namespace rviz
 
  #endif
-
