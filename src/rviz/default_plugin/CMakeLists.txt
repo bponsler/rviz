@@ -70,21 +70,21 @@ add_library(${rviz_DEFAULT_PLUGIN_LIBRARY_TARGET_NAME} ${SOURCE_FILES})
 target_link_libraries(${rviz_DEFAULT_PLUGIN_LIBRARY_TARGET_NAME}
   ${PROJECT_NAME}
   ${Boost_LIBRARIES}
-  ${catkin_LIBRARIES}
+  ${LIBS}
   ${OGRE_OV_LIBRARIES_ABS}
   ${QT_LIBRARIES}
 )
 
 install(TARGETS ${rviz_DEFAULT_PLUGIN_LIBRARY_TARGET_NAME}
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib)
 
 # Generate to the devel space so the extras file can include it from the devel space.
 file(GENERATE
-  OUTPUT "${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/cmake/default_plugin_location.cmake"
+  OUTPUT "${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/cmake/default_plugin_location.cmake"
   CONTENT "set(rviz_DEFAULT_PLUGIN_FILE_NAME $<TARGET_FILE_NAME:${rviz_DEFAULT_PLUGIN_LIBRARY_TARGET_NAME}>)"
 )
 # Install from the devel space to the install space.
-install(FILES "${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/cmake/default_plugin_location.cmake"
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/cmake
+install(FILES "${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/cmake/default_plugin_location.cmake"
+  DESTINATION share/${PROJECT_NAME}/cmake
 )

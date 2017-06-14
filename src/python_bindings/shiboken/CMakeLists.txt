@@ -90,11 +90,11 @@ if(shiboken_helper_FOUND)
     shiboken_include_directories(rviz_shiboken "${rviz_shiboken_QT_COMPONENTS}")
     add_library(rviz_shiboken ${rviz_shiboken_SRCS})
     set_target_properties(rviz_shiboken PROPERTIES
-      LIBRARY_OUTPUT_DIRECTORY ${CATKIN_DEVEL_PREFIX}/${PYTHON_INSTALL_DIR}/rviz)
+      LIBRARY_OUTPUT_DIRECTORY ${CMAKE_INSTALL_PREFIX}/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/rviz)
     target_link_libraries(rviz_shiboken ${PROJECT_NAME})
     shiboken_target_link_libraries(rviz_shiboken "${rviz_shiboken_QT_COMPONENTS}")
 
     install(TARGETS rviz_shiboken
-      LIBRARY DESTINATION ${CATKIN_PACKAGE_PYTHON_DESTINATION})
+      LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR})
   endif()
 endif()
