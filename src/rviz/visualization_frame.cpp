@@ -54,7 +54,6 @@
 
 #include <ros2_console/console.hpp>
 #include <rospack/rospack.h>
-#include <rclcpp/rclcpp.hpp>
 
 //#include <OgreRenderWindow.h>
 #include <OgreMeshManager.h>

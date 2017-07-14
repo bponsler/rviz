@@ -34,6 +34,7 @@
 #include <deque>
 
 #include <ros2_time/time.hpp>
+#include <rclcpp/node.hpp>
 
 #include "rviz/bit_allocator.h"
 #include "rviz/config.h"
@@ -358,6 +359,8 @@ protected:
 
   volatile bool shutting_down_;
 
+  rclcpp::node::Node::SharedPtr nh_;
+  
   PropertyTreeModel* display_property_tree_model_;
   DisplayGroup* root_display_group_;
 

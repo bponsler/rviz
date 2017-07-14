@@ -128,6 +128,8 @@ VisualizationManager::VisualizationManager( RenderPanel* render_panel, WindowMan
 {
   frame_manager_ = new FrameManager(tf);
 
+  nh_ = rclcpp::node::Node::make_shared("rviz_visualization_manager");
+  
   render_panel->setAutoRender(false);
 
   //private_->threaded_nh_.setCallbackQueue(&private_->threaded_queue_); // TODO: fix this
@@ -314,9 +316,7 @@ void VisualizationManager::onUpdate()
     resetTime();
   }
 
-  rclcpp::node::Node::SharedPtr nh = rclcpp::node::Node::make_shared(
-      "rviz_visualization_manager");
-  rclcpp::spin_some(nh); // TODO: is this the equivalent of spin_once?
+  rclcpp::spin_some(nh_);
 
   Q_EMIT preUpdate();
 
