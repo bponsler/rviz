@@ -31,8 +31,11 @@
 #define RVIZ_POINT_TOOL_H
 
 #ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
-# include <ros/node_handle.h>
-# include <ros/publisher.h>
+
+#include <geometry_msgs/msg/point_stamped.hpp>
+
+# include <rclcpp/node.hpp>
+# include <rclcpp/publisher.hpp>
 
 # include "rviz/tool.h"
 
@@ -70,8 +73,8 @@ protected:
   QCursor std_cursor_;
   QCursor hit_cursor_;
 
-  ros::NodeHandle nh_;
-  ros::Publisher pub_;
+  rclcpp::node::Node::SharedPtr nh_;
+  rclcpp::publisher::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr pub_;
 
   StringProperty* topic_property_;
   BoolProperty* auto_deactivate_property_;

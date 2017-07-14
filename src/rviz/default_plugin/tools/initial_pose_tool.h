@@ -33,7 +33,9 @@
 #ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
 # include <QObject>
 
-# include <ros/ros.h>
+#include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
+
+# include <rclcpp/rclcpp.hpp>
 
 # include "rviz/default_plugin/tools/pose_tool.h"
 #endif
@@ -59,8 +61,8 @@ private Q_SLOTS:
   void updateTopic();
 
 private:
-  ros::NodeHandle nh_;
-  ros::Publisher pub_;
+  rclcpp::node::Node::SharedPtr nh_;
+  rclcpp::publisher::Publisher<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr pub_;
 
   StringProperty* topic_property_;
 };

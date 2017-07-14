@@ -32,7 +32,7 @@
 #include <OgreManualObject.h>
 #include <OgreBillboardSet.h>
 
-#include <tf/transform_listener.h>
+#include <tf2_ros/transform_listener.h>
 
 #include "rviz/frame_manager.h"
 #include "rviz/ogre_helpers/arrow.h"
@@ -71,8 +71,11 @@ GridCellsDisplay::GridCellsDisplay()
 
 void GridCellsDisplay::onInitialize()
 {
+  /*  // TODO: get message filters working
   tf_filter_ = new tf::MessageFilter<nav_msgs::msg::GridCells>( *context_->getTFClient(), fixed_frame_.toStdString(),
                                                            10, update_nh_ );
+  */
+  
   static int count = 0;
   std::stringstream ss;
   ss << "PolyLine" << count++;
@@ -84,9 +87,11 @@ void GridCellsDisplay::onInitialize()
   scene_node_->attachObject( cloud_ );
   updateAlpha();
 
+  /*  // TODO get message filters working
   tf_filter_->connectInput( sub_ );
   tf_filter_->registerCallback( std::bind( &GridCellsDisplay::incomingMessage, this, std::placeholders::_1 ));
   context_->getFrameManager()->registerFilterForTransformStatusCheck( tf_filter_, this );
+  */
 }
 
 GridCellsDisplay::~GridCellsDisplay()
@@ -97,7 +102,7 @@ GridCellsDisplay::~GridCellsDisplay()
     clear();
     scene_node_->detachObject( cloud_ );
     delete cloud_;
-    delete tf_filter_;
+    //delete tf_filter_;  // TODO: get message filters working
   }
 }
 
@@ -160,7 +165,7 @@ void GridCellsDisplay::fixedFrameChanged()
 {
   clear();
 
-  tf_filter_->setTargetFrame( fixed_frame_.toStdString() );
+  //tf_filter_->setTargetFrame( fixed_frame_.toStdString() );  // TODO: get message filters working
 }
 
   bool validateFloats(const nav_msgs::msg::GridCells& msg)

@@ -9,7 +9,7 @@ set(SOURCE_FILES
   # effort_visual.cpp
   # fluid_pressure_display.cpp
   # grid_cells_display.cpp
-  # grid_display.cpp
+  grid_display.cpp
   # illuminance_display.cpp
   # image_display.cpp
   # interactive_marker_display.cpp
@@ -47,15 +47,15 @@ set(SOURCE_FILES
   # robot_model_display.cpp
   # temperature_display.cpp
   # tf_display.cpp
-  # tools/focus_tool.cpp
-  # tools/measure_tool.cpp
-  # tools/move_tool.cpp
-  # tools/point_tool.cpp
-  # tools/pose_tool.cpp
-  # tools/goal_tool.cpp
-  # tools/initial_pose_tool.cpp
-  # tools/selection_tool.cpp
-  # tools/interaction_tool.cpp
+  tools/focus_tool.cpp
+  tools/measure_tool.cpp
+  tools/move_tool.cpp
+  tools/point_tool.cpp
+  tools/pose_tool.cpp
+  tools/goal_tool.cpp
+  tools/initial_pose_tool.cpp
+  tools/selection_tool.cpp
+  tools/interaction_tool.cpp
   view_controllers/orbit_view_controller.cpp
   view_controllers/xy_orbit_view_controller.cpp
   view_controllers/third_person_follower_view_controller.cpp
@@ -66,7 +66,7 @@ set(SOURCE_FILES
   ${MOC_FILES}
 )
 
-add_library(${rviz_DEFAULT_PLUGIN_LIBRARY_TARGET_NAME} ${SOURCE_FILES})
+add_library(${rviz_DEFAULT_PLUGIN_LIBRARY_TARGET_NAME} SHARED ${SOURCE_FILES})
 target_link_libraries(${rviz_DEFAULT_PLUGIN_LIBRARY_TARGET_NAME}
   ${PROJECT_NAME}
   ${Boost_LIBRARIES}

@@ -296,7 +296,8 @@ bool VisualizerApp::init( int argc, char** argv )
 
     frame_->show();
 
-    rclcpp::node::Node::SharedPtr private_nh = rclcpp::node::Node::make_shared("~");
+    rclcpp::node::Node::SharedPtr private_nh = rclcpp::node::Node::make_shared(
+        "rviz_visualizer_app");
     reload_shaders_service_ = private_nh->create_service<std_srvs::srv::Empty>(
         "reload_shaders", reloadShaders);
 

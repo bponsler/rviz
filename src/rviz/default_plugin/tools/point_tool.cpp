@@ -30,6 +30,8 @@
 #include <OgreRay.h>
 #include <OgreVector3.h>
 
+#include <rclcpp/time.hpp>
+
 #include "rviz/viewport_mouse_event.h"
 #include "rviz/load_resource.h"
 #include "rviz/render_panel.h"
@@ -41,8 +43,6 @@
 
 #include "rviz/properties/bool_property.h"
 #include "rviz/properties/string_property.h"
-
-#include <geometry_msgs/msg/point_stamped.hpp>
 
 #include <sstream>
 
@@ -83,7 +83,8 @@ void PointTool::deactivate()
 
 void PointTool::updateTopic()
 {
-  pub_ = nh_.advertise<geometry_msgs::msg::PointStamped>( topic_property_->getStdString(), 1 );
+  nh_ = rclcpp::node::Node::make_shared("rviz_point_tool");
+  pub_ = nh_->create_publisher<geometry_msgs::msg::PointStamped>( topic_property_->getStdString(), 1 );
 }
 
 void PointTool::updateAutoDeactivate()
@@ -113,8 +114,8 @@ int PointTool::processMouseEvent( ViewportMouseEvent& event )
       ps.point.y = pos.y;
       ps.point.z = pos.z;
       ps.header.frame_id = context_->getFixedFrame().toStdString();
-      ps.header.stamp = ros2_time::Time::now();
-      pub_.publish( ps );
+      ps.header.stamp = rclcpp::Time::now();
+      pub_->publish( ps );
 
       if ( auto_deactivate_property_->getBool() )
       {

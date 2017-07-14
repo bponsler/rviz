@@ -27,9 +27,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-//#include <tf/transform_listener.h> // TODO: need this header
+#include <tf2_ros/transform_listener.h>
 
-#include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
+#include <ros2_console/console.hpp>
 
 #include "rviz/display_context.h"
 #include "rviz/properties/string_property.h"
@@ -57,7 +57,8 @@ void InitialPoseTool::onInitialize()
 
 void InitialPoseTool::updateTopic()
 {
-  pub_ = nh_.advertise<geometry_msgs::msg::PoseWithCovarianceStamped>( topic_property_->getStdString(), 1 );
+  nh_ = rclcpp::node::Node::make_shared("rviz_initial_pose_tool");
+  pub_ = nh_->create_publisher<geometry_msgs::msg::PoseWithCovarianceStamped>( topic_property_->getStdString(), 1 );
 }
 
 void InitialPoseTool::onPoseSet(double x, double y, double theta)
@@ -65,19 +66,25 @@ void InitialPoseTool::onPoseSet(double x, double y, double theta)
   std::string fixed_frame = context_->getFixedFrame().toStdString();
   geometry_msgs::msg::PoseWithCovarianceStamped pose;
   pose.header.frame_id = fixed_frame;
-  pose.header.stamp = ros::Time::now();
+  pose.header.stamp = rclcpp::Time::now();
   pose.pose.pose.position.x = x;
   pose.pose.pose.position.y = y;
 
   tf2::Quaternion quat;
   quat.setRPY(0.0, 0.0, theta);
-  tf2::quaternionTFToMsg(quat,
-			 pose.pose.pose.orientation);
+
+  // Implemntation of quaternionTfToMsg
+  if (fabs(quat.length2() - 1) > 0.1f) quat.normalize();
+  pose.pose.pose.orientation.x = quat.x();
+  pose.pose.pose.orientation.y = quat.y();
+  pose.pose.pose.orientation.z = quat.z();
+  pose.pose.pose.orientation.w = quat.w();
+  
   pose.pose.covariance[6*0+0] = 0.5 * 0.5;
   pose.pose.covariance[6*1+1] = 0.5 * 0.5;
   pose.pose.covariance[6*5+5] = M_PI/12.0 * M_PI/12.0;
   ROS_INFO("Setting pose: %.3f %.3f %.3f [frame=%s]", x, y, theta, fixed_frame.c_str());
-  pub_.publish(pose);
+  pub_->publish(pose);
 }
 
 } // end namespace rviz

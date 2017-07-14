@@ -32,6 +32,8 @@
 #include <OgreSceneNode.h>
 #include <OgreViewport.h>
 
+#include <ros2_console/assert.hpp>
+
 #include "rviz/geometry.h"
 #include "rviz/ogre_helpers/arrow.h"
 #include "rviz/viewport_mouse_event.h"

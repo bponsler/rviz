@@ -37,8 +37,8 @@
 #include <nav_msgs/msg/map_meta_data.hpp>
 
 #ifndef Q_MOC_RUN
-#include <message_filters/subscriber.h>
-#include <tf2_ros/message_filter.h>
+//#include <message_filters/subscriber.h>
+//#include <tf2_ros/message_filter.h>
 #endif
 
 #include <boost/shared_ptr.hpp>
@@ -90,8 +90,9 @@ private:
 
   PointCloud* cloud_;
 
-  message_filters::Subscriber<nav_msgs::msg::GridCells> sub_;
-  tf::MessageFilter<nav_msgs::msg::GridCells>* tf_filter_;
+  // TODO: get message filters working
+  //message_filters::Subscriber<nav_msgs::msg::GridCells> sub_;
+  //tf::MessageFilter<nav_msgs::msg::GridCells>* tf_filter_;
 
   ColorProperty* color_property_;
   RosTopicProperty* topic_property_;

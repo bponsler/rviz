@@ -32,8 +32,6 @@
 
 #include <stdint.h>
 
-#include <ros/subscriber.h>
-
 #include <rviz/interactive_object.h>
 
 #include "move_tool.h"

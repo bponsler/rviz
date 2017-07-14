@@ -40,8 +40,6 @@
 #include <OgreTexture.h>
 #include <OgreTextureManager.h>
 
-#include <ros/time.h>
-
 #include "move_tool.h"
 
 #include "rviz/ogre_helpers/camera_base.h"
