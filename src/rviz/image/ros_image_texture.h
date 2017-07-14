@@ -30,7 +30,7 @@
 #ifndef RVIZ_ROS_IMAGE_TEXTURE_H
 #define RVIZ_ROS_IMAGE_TEXTURE_H
 
-#include <sensor_msgs/Image.h>
+#include <sensor_msgs/msg/image.hpp>
 
 #include <OgreTexture.h>
 #include <OgreImage.h>
@@ -38,8 +38,6 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/mutex.hpp>
-
-#include <ros/ros.h>
 
 #include <stdexcept>
 
@@ -60,12 +58,12 @@ public:
   ROSImageTexture();
   ~ROSImageTexture();
 
-  void addMessage(const sensor_msgs::Image::ConstPtr& image);
+  void addMessage(const sensor_msgs::msg::Image::SharedPtr image);
   bool update();
   void clear();
 
   const Ogre::TexturePtr& getTexture() { return texture_; }
-  const sensor_msgs::Image::ConstPtr& getImage();
+  const sensor_msgs::msg::Image::SharedPtr getImage();
 
   uint32_t getWidth() { return width_; }
   uint32_t getHeight() { return height_; }
@@ -81,7 +79,7 @@ private:
   template<typename T>
   void normalize( T* image_data, size_t image_data_size, std::vector<uint8_t> &buffer  );
 
-  sensor_msgs::Image::ConstPtr current_image_;
+  sensor_msgs::msg::Image::SharedPtr current_image_;
   boost::mutex mutex_;
   bool new_image_;
 

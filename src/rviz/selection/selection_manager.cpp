@@ -49,12 +49,12 @@
 #include <OgreTechnique.h>
 #include <OgreRectangle2D.h>
 
-#include <sensor_msgs/image_encodings.h>
-#include <sensor_msgs/Image.h>
+#include <sensor_msgs_util/image_encodings.h>
 
-#include <ros/assert.h>
-#include <ros/node_handle.h>
-#include <ros/publisher.h>
+#include <ros2_console/assert.hpp>
+#include <ros2_time/time.hpp>
+#include <rclcpp/node.hpp>
+#include <rclcpp/time.hpp>
 
 #include "rviz/ogre_helpers/arrow.h"
 #include "rviz/ogre_helpers/axes.h"
@@ -704,7 +704,7 @@ bool SelectionManager::render(Ogre::Viewport* viewport, Ogre::TexturePtr tex,
   // make sure the same objects are visible as in the original viewport
   render_viewport->setVisibilityMask( viewport->getVisibilityMask() );
 
-  ros::WallTime start = ros::WallTime::now();
+  ros2_time::WallTime start = ros2_time::WallTime::now();
 
   // update & force ogre to render the scene
   Ogre::MaterialManager::getSingleton().addListener(this);
@@ -724,8 +724,8 @@ bool SelectionManager::render(Ogre::Viewport* viewport, Ogre::TexturePtr tex,
   vis_manager_->getSceneManager()->_renderScene(main_view->getCamera(), main_view, false);
   vis_manager_->getSceneManager()->removeRenderQueueListener(this);
 
-  ros::WallTime end = ros::WallTime::now();
-  ros::WallDuration d = end - start;
+  ros2_time::WallTime end = ros2_time::WallTime::now();
+  ros2_time::WallDuration d = end - start;
 //  ROS_DEBUG("Render took [%f] msec", d.toSec() * 1000.0f);
 
   Ogre::MaterialManager::getSingleton().removeListener(this);
@@ -755,12 +755,12 @@ bool SelectionManager::render(Ogre::Viewport* viewport, Ogre::TexturePtr tex,
 
 void SelectionManager::publishDebugImage( const Ogre::PixelBox& pixel_box, const std::string& label )
 {
-  ros::Publisher pub;
-  ros::NodeHandle nh;
+  rclcpp::publisher::Publisher<sensor_msgs::msg::Image>::SharedPtr pub;
+  rclcpp::node::Node::SharedPtr nh = rclcpp::node::Node::make_shared("rviz");
   PublisherMap::const_iterator iter = debug_publishers_.find( label );
   if( iter == debug_publishers_.end() )
   {
-    pub = nh.advertise<sensor_msgs::Image>( "/rviz_debug/" + label, 2 );
+    pub = nh->create_publisher<sensor_msgs::msg::Image>( "/rviz_debug/" + label, 2 );
     debug_publishers_[ label ] = pub;
   }
   else
@@ -768,11 +768,11 @@ void SelectionManager::publishDebugImage( const Ogre::PixelBox& pixel_box, const
     pub = iter->second;
   }
 
-  sensor_msgs::Image msg;
-  msg.header.stamp = ros::Time::now();
+  sensor_msgs::msg::Image msg;
+  msg.header.stamp = rclcpp::Time::now();
   msg.width = pixel_box.getWidth();
   msg.height = pixel_box.getHeight();
-  msg.encoding = sensor_msgs::image_encodings::RGB8;
+  msg.encoding = sensor_msgs_util::image_encodings::RGB8;
   msg.is_bigendian = false;
   msg.step = msg.width * 3;
   int dest_byte_count = msg.width * msg.height * 3;
@@ -807,7 +807,7 @@ void SelectionManager::publishDebugImage( const Ogre::PixelBox& pixel_box, const
     msg.data[ dest_index++ ] = b;
   }
 
-  pub.publish( msg );
+  pub->publish( msg );
 }
 
 void SelectionManager::renderQueueStarted( uint8_t queueGroupId,

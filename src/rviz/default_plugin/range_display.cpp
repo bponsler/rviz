@@ -117,7 +117,7 @@ void RangeDisplay::updateBufferLength()
 
     Ogre::Vector3 position;
     Ogre::Quaternion orientation;
-    geometry_msgs::Pose pose;
+    geometry_msgs::msg::Pose pose;
     pose.orientation.w = 1;
     Ogre::Vector3 scale( 0, 0, 0 );
     cone->setScale( scale );
@@ -131,7 +131,7 @@ void RangeDisplay::processMessage( const sensor_msgs::Range::ConstPtr& msg )
 
   Ogre::Vector3 position;
   Ogre::Quaternion orientation;
-  geometry_msgs::Pose pose;
+  geometry_msgs::msg::Pose pose;
   float displayed_range = 0.0;
   if(msg->min_range <= msg->range && msg->range <= msg->max_range){
     displayed_range = msg->range;

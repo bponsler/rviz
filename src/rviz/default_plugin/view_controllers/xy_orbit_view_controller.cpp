@@ -29,8 +29,6 @@
 
 #include <stdint.h>
 
-#include <ros/ros.h>
-
 #include <OgreCamera.h>
 #include <OgrePlane.h>
 #include <OgreQuaternion.h>

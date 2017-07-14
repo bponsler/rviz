@@ -35,7 +35,6 @@
 #include <OgreMaterialManager.h>
 #include <OgreGpuProgramManager.h>
 #include <OgreHighLevelGpuProgramManager.h>
-#include <std_srvs/Empty.h>
 
 #ifdef Q_OS_MAC
 #include <ApplicationServices/ApplicationServices.h>
@@ -44,8 +43,8 @@
 #undef check
 #endif
 
-#include <ros/console.h>
-#include <ros/ros.h>
+#include <ros2_console/console.hpp>
+#include <rclcpp/rclcpp.hpp>
 
 #include "rviz/selection/selection_manager.h"
 #include "rviz/env_config.h"
@@ -64,7 +63,10 @@ namespace po = boost::program_options;
 namespace rviz
 {
 
-bool reloadShaders(std_srvs::Empty::Request&, std_srvs::Empty::Response&)
+bool reloadShaders(
+    const std::shared_ptr<rmw_request_id_t> request_header,
+    const std::shared_ptr<std_srvs::srv::Empty::Request>,
+    const std::shared_ptr<std_srvs::srv::Empty::Response>)
 {
   ROS_INFO("Reloading materials.");
   {
@@ -127,7 +129,7 @@ bool VisualizerApp::init( int argc, char** argv )
   try
   {
 #endif
-    ros::init( argc, argv, "rviz", ros::init_options::AnonymousName );
+    rclcpp::init( argc, argv );
 
     startContinueChecker();
 
@@ -224,10 +226,12 @@ bool VisualizerApp::init( int argc, char** argv )
 
       if (vm.count("log-level-debug"))
       {
-        if( ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug) )
-        {
-          ros::console::notifyLoggerLevelsChanged();
-        }
+	// TODO: disable this for now
+	ROS_WARN("The log-level-debug argument is not implemented yet");
+        //if( ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug) )
+        //{
+        //  ros::console::notifyLoggerLevelsChanged();
+        //}
       }
     }
     catch (std::exception& e)
@@ -236,6 +240,7 @@ bool VisualizerApp::init( int argc, char** argv )
       return false;
     }
 
+    /*  // No master in ROS 2
     if( !ros::master::check() )
     {
       WaitForMasterDialog* dialog = new WaitForMasterDialog;
@@ -244,12 +249,14 @@ bool VisualizerApp::init( int argc, char** argv )
         return false;
       }
     }
+    */
 
-    nh_.reset( new ros::NodeHandle );
+    // TODO: is there a way to do: ros::init_options::AnonymousName ?
+    nh_ = rclcpp::node::Node::make_shared("rviz");
 
     if( enable_ogre_log )
     {
-      OgreLogging::useRosLog();
+      //OgreLogging::useRosLog(); // TODO: enable once ogre is working
     }
 
     if ( force_gl_version )
@@ -284,12 +291,14 @@ bool VisualizerApp::init( int argc, char** argv )
       frame_->getManager()->setFixedFrame( QString::fromStdString( fixed_frame ));
     }
 
-    frame_->getManager()->getSelectionManager()->setDebugMode( verbose );
+    // TODO: once selection manager is included
+    //frame_->getManager()->getSelectionManager()->setDebugMode( verbose );
 
     frame_->show();
 
-    ros::NodeHandle private_nh("~");
-    reload_shaders_service_ = private_nh.advertiseService("reload_shaders", reloadShaders);
+    rclcpp::node::Node::SharedPtr private_nh = rclcpp::node::Node::make_shared("~");
+    reload_shaders_service_ = private_nh->create_service<std_srvs::srv::Empty>(
+        "reload_shaders", reloadShaders);
 
 #if CATCH_EXCEPTIONS
   }
@@ -317,7 +326,7 @@ void VisualizerApp::startContinueChecker()
 
 void VisualizerApp::checkContinue()
 {
-  if( !ros::ok() )
+  if( !rclcpp::ok() )
   {
     if( frame_ )
     {

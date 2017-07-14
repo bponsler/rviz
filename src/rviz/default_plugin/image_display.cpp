@@ -27,8 +27,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <boost/bind.hpp>
-
 #include <OgreManualObject.h>
 #include <OgreMaterialManager.h>
 #include <OgreRectangle2D.h>
@@ -49,7 +47,7 @@
 #include "rviz/render_panel.h"
 #include "rviz/validate_floats.h"
 
-#include <sensor_msgs/image_encodings.h>
+#include <sensor_msgs_util/image_encodings.h>
 
 #include "image_display.h"
 
@@ -230,12 +228,12 @@ void ImageDisplay::reset()
 }
 
 /* This is called by incomingMessage(). */
-void ImageDisplay::processMessage(const sensor_msgs::Image::ConstPtr& msg)
+void ImageDisplay::processMessage(const sensor_msgs::msg::Image::SharedPtr msg)
 {
-  bool got_float_image = msg->encoding == sensor_msgs::image_encodings::TYPE_32FC1 ||
-      msg->encoding == sensor_msgs::image_encodings::TYPE_16UC1 ||
-      msg->encoding == sensor_msgs::image_encodings::TYPE_16SC1 ||
-      msg->encoding == sensor_msgs::image_encodings::MONO16;
+  bool got_float_image = msg->encoding == sensor_msgs_util::image_encodings::TYPE_32FC1 ||
+      msg->encoding == sensor_msgs_util::image_encodings::TYPE_16UC1 ||
+      msg->encoding == sensor_msgs_util::image_encodings::TYPE_16SC1 ||
+      msg->encoding == sensor_msgs_util::image_encodings::MONO16;
 
   if ( got_float_image != got_float_image_ )
   {

@@ -39,7 +39,7 @@
 
 #include <sstream>
 
-#include <ros/assert.h>
+#include <ros2_console/assert.hpp>
 
 #define MAX_ELEMENTS (65536/4)
 

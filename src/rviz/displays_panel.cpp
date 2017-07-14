@@ -34,11 +34,9 @@
 #include <QInputDialog>
 #include <QApplication>
 
-#include <boost/bind.hpp>
-
 #include "rviz/display_factory.h"
 #include "rviz/display.h"
-#include "rviz/add_display_dialog.h"
+//#include "rviz/add_display_dialog.h"
 #include "rviz/properties/property.h"
 #include "rviz/properties/property_tree_widget.h"
 #include "rviz/properties/property_tree_with_help.h"
@@ -103,6 +101,7 @@ void DisplaysPanel::onInitialize()
 
 void DisplaysPanel::onNewDisplay()
 {
+#if 0  // TODO: disabled until add_display_dialog is working
   QString lookup_name;
   QString display_name;
   QString topic;
@@ -131,6 +130,7 @@ void DisplaysPanel::onNewDisplay()
   }
   vis_manager_->startUpdate();
   activateWindow(); // Force keyboard focus back on main window.
+#endif  // TODO: disabled until add_display_dialog is working
 }
 
 void DisplaysPanel::onDuplicateDisplay()

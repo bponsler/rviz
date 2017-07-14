@@ -27,8 +27,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <boost/bind.hpp>
-
 #include <OgreManualObject.h>
 #include <OgreMaterialManager.h>
 #include <OgreRectangle2D.h>
@@ -209,7 +207,7 @@ void CameraDisplay::onInitialize()
   render_panel_->getCamera()->setNearClipDistance( 0.01f );
 
   caminfo_tf_filter_->connectInput(caminfo_sub_);
-  caminfo_tf_filter_->registerCallback(boost::bind(&CameraDisplay::caminfoCallback, this, _1));
+  caminfo_tf_filter_->registerCallback(std::bind(&CameraDisplay::caminfoCallback, this, std::placeholders::_1));
   //context_->getFrameManager()->registerFilterForTransformStatusCheck(caminfo_tf_filter_, this);
 
   vis_bit_ = context_->visibilityBits()->allocBit();

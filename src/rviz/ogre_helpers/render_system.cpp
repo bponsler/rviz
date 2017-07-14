@@ -45,8 +45,8 @@
 #undef CursorShape
 #endif
 
-#include <ros/package.h> // This dependency should be moved out of here, it is just used for a search path.
-#include <ros/console.h>
+#include <rospack/rospack.h>  // This dependency should be moved out of here, it is just used for a search path.
+#include <ros2_console/console.hpp>
 
 #include <OgreRenderWindow.h>
 #include <OgreSceneManager.h>
@@ -60,6 +60,8 @@
 #include "rviz/ogre_helpers/render_system.h"
 
 #include <QMessageBox>
+
+#define ROS_PACKAGE_NAME "rviz"
 
 namespace rviz
 {
@@ -102,7 +104,16 @@ RenderSystem::RenderSystem()
 {
   OgreLogging::configureLogging();
 
-  std::string rviz_path = ros::package::getPath(ROS_PACKAGE_NAME);
+  std::string rviz_path;
+  rospack::Rospack rp;
+  std::vector<std::string> search_path;
+  if(!rp.getSearchPathFromEnv(search_path)) {
+    throw std::runtime_error("Failed to find package search path: rviz");
+  }
+  rp.crawl(search_path, false);
+  if (!rp.find(ROS_PACKAGE_NAME, rviz_path)) {
+    throw std::runtime_error("Failed to find package: rviz");
+  }
 
   setupDummyWindowId();
   ogre_root_ = new Ogre::Root( rviz_path+"/ogre_media/plugins.cfg" );
@@ -257,7 +268,17 @@ void RenderSystem::setupRenderSystem()
 
 void RenderSystem::setupResources()
 {
-  std::string rviz_path = ros::package::getPath(ROS_PACKAGE_NAME);
+  std::string rviz_path;
+  rospack::Rospack rp;
+  std::vector<std::string> search_path;
+  if(!rp.getSearchPathFromEnv(search_path)) {
+    throw std::runtime_error("Failed to find package search path: rviz");
+  }
+  rp.crawl(search_path, false);
+  if (!rp.find(ROS_PACKAGE_NAME, rviz_path)) {
+    throw std::runtime_error("Failed to find package: rviz");
+  }
+  
   Ogre::ResourceGroupManager::getSingleton().addResourceLocation( rviz_path + "/ogre_media", "FileSystem", ROS_PACKAGE_NAME );
   Ogre::ResourceGroupManager::getSingleton().addResourceLocation( rviz_path + "/ogre_media/textures", "FileSystem", ROS_PACKAGE_NAME );
   Ogre::ResourceGroupManager::getSingleton().addResourceLocation( rviz_path + "/ogre_media/fonts", "FileSystem", ROS_PACKAGE_NAME );
@@ -289,7 +310,9 @@ void RenderSystem::setupResources()
 
   // Add paths exported to the "media_export" package.
   std::vector<std::string> media_paths;
-  ros::package::getPlugins( "media_export", "ogre_media_path", media_paths );
+  //ros::package::getPlugins( "media_export", "ogre_media_path", media_paths );
+  // TODO: update this to find plugins
+  
   std::string delim(":");
   for( std::vector<std::string>::iterator iter = media_paths.begin(); iter != media_paths.end(); ++iter )
   {
@@ -428,7 +451,8 @@ Ogre::RenderWindow* RenderSystem::makeRenderWindow( intptr_t window_id, unsigned
 
   stereo_supported_ = is_stereo;
 
-  ROS_INFO_ONCE("Stereo is %s", stereo_supported_ ? "SUPPORTED" : "NOT SUPPORTED");
+  // TODO: support ROS_INFO_ONCE
+  //ROS_INFO_ONCE("Stereo is %s", stereo_supported_ ? "SUPPORTED" : "NOT SUPPORTED");
 
   return window;
 }

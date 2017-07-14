@@ -40,7 +40,7 @@
 # include <message_filters/subscriber.h>
 # include <message_filters/synchronizer.h>
 # include <message_filters/sync_policies/approximate_time.h>
-# include <tf/message_filter.h>
+# include <tf2_ros/message_filter.h>
 
 # include "rviz/properties/enum_property.h"
 # include "rviz/properties/float_property.h"

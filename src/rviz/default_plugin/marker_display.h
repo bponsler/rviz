@@ -37,12 +37,12 @@
 #include <boost/shared_ptr.hpp>
 
 #ifndef Q_MOC_RUN
-#include <tf/message_filter.h>
+#include <tf2_ros/message_filter.h>
 #include <message_filters/subscriber.h>
 #endif
 
-#include <visualization_msgs/Marker.h>
-#include <visualization_msgs/MarkerArray.h>
+#include <visualization_msgs/msg/marker.hpp>
+#include <visualization_msgs/msg/marker_array.hpp>
 
 #include "rviz/display.h"
 #include "rviz/properties/bool_property.h"
@@ -65,7 +65,7 @@ typedef std::pair<std::string, int32_t> MarkerID;
  * \class MarkerDisplay
  * \brief Displays "markers" sent in by other ROS nodes on the "visualization_marker" topic
  *
- * Markers come in as visualization_msgs::Marker messages.  See the Marker message for more information.
+ * Markers come in as visualization_msgs::msg::Marker messages.  See the Marker message for more information.
  */
 class MarkerDisplay: public Display
 {
@@ -106,7 +106,7 @@ protected:
   virtual void unsubscribe();
 
   /** @brief Process a MarkerArray message. */
-  void incomingMarkerArray( const visualization_msgs::MarkerArray::ConstPtr& array );
+  void incomingMarkerArray( const visualization_msgs::msg::MarkerArray::SharedPtr array );
 
   ros::Subscriber array_sub_;
 
@@ -130,37 +130,37 @@ private:
    * \brief Processes a marker message
    * @param message The message to process
    */
-  void processMessage( const visualization_msgs::Marker::ConstPtr& message );
+  void processMessage( const visualization_msgs::msg::Marker::SharedPtr message );
   /**
    * \brief Processes an "Add" marker message
    * @param message The message to process
    */
-  void processAdd( const visualization_msgs::Marker::ConstPtr& message );
+  void processAdd( const visualization_msgs::msg::Marker::SharedPtr message );
   /**
    * \brief Processes a "Delete" marker message
    * @param message The message to process
    */
-  void processDelete( const visualization_msgs::Marker::ConstPtr& message );
+  void processDelete( const visualization_msgs::msg::Marker::SharedPtr message );
 
   /**
    * \brief ROS callback notifying us of a new marker
    */
-  void incomingMarker(const visualization_msgs::Marker::ConstPtr& marker);
+  void incomingMarker(const visualization_msgs::msg::Marker::SharedPtr marker);
 
-  void failedMarker(const ros::MessageEvent<visualization_msgs::Marker>& marker_evt, tf::FilterFailureReason reason);
+  void failedMarker(const ros::MessageEvent<visualization_msgs::msg::Marker>& marker_evt, tf::FilterFailureReason reason);
 
   typedef std::map<MarkerID, MarkerBasePtr> M_IDToMarker;
   typedef std::set<MarkerBasePtr> S_MarkerBase;
   M_IDToMarker markers_;                                ///< Map of marker id to the marker info structure
   S_MarkerBase markers_with_expiration_;
   S_MarkerBase frame_locked_markers_;
-  typedef std::vector<visualization_msgs::Marker::ConstPtr> V_MarkerMessage;
+  typedef std::vector<visualization_msgs::msg::Marker::SharedPtr> V_MarkerMessage;
   V_MarkerMessage message_queue_;                       ///< Marker message queue.  Messages are added to this as they are received, and then processed
                                                         ///< in our update() function
   boost::mutex queue_mutex_;
 
-  message_filters::Subscriber<visualization_msgs::Marker> sub_;
-  tf::MessageFilter<visualization_msgs::Marker>* tf_filter_;
+  message_filters::Subscriber<visualization_msgs::msg::Marker> sub_;
+  tf::MessageFilter<visualization_msgs::msg::Marker>* tf_filter_;
 
   typedef QHash<QString, MarkerNamespace*> M_Namespace;
   M_Namespace namespaces_;

@@ -90,7 +90,7 @@ public:
     }
   }
 
-  void setMessage(const geometry_msgs::PoseStampedConstPtr& message)
+  void setMessage(const geometry_msgs::msg::PoseStamped::SharedPtr message)
   {
     // properties_.size() should only be > 0 after createProperties()
     // and before destroyProperties(), during which frame_property_,
@@ -253,7 +253,7 @@ void PoseDisplay::updateShapeVisibility()
   }
 }
 
-void PoseDisplay::processMessage( const geometry_msgs::PoseStamped::ConstPtr& message )
+void PoseDisplay::processMessage( const geometry_msgs::msg::PoseStamped::SharedPtr message )
 {
   if( !validateFloats( *message ))
   {

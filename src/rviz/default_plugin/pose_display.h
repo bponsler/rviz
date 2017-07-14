@@ -33,7 +33,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/msg/pose_stamped.hpp>
 
 #include "rviz/message_filter_display.h"
 #include "rviz/selection/forwards.h"
@@ -50,8 +50,8 @@ class Shape;
 class PoseDisplaySelectionHandler;
 typedef boost::shared_ptr<PoseDisplaySelectionHandler> PoseDisplaySelectionHandlerPtr;
 
-/** @brief Accumulates and displays the pose from a geometry_msgs::PoseStamped message. */
-class PoseDisplay: public MessageFilterDisplay<geometry_msgs::PoseStamped>
+/** @brief Accumulates and displays the pose from a geometry_msgs::msg::PoseStamped message. */
+class PoseDisplay: public MessageFilterDisplay<geometry_msgs::msg::PoseStamped>
 {
 Q_OBJECT
 public:
@@ -81,7 +81,7 @@ private Q_SLOTS:
 private:
   void clear();
 
-  virtual void processMessage( const geometry_msgs::PoseStamped::ConstPtr& message );
+  virtual void processMessage( const geometry_msgs::msg::PoseStamped::SharedPtr message );
 
   rviz::Arrow* arrow_;
   rviz::Axes* axes_;

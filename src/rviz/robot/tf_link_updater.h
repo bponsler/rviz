@@ -33,7 +33,6 @@
 #include "link_updater.h"
 
 #include <string>
-#include <boost/function.hpp>
 
 namespace tf
 {

@@ -28,7 +28,7 @@
  */
 
 #include "point_cloud.h"
-#include <ros/assert.h>
+#include <ros2_console/assert.hpp>
 
 #include <OgreSceneManager.h>
 #include <OgreSceneNode.h>
@@ -600,7 +600,8 @@ void PointCloud::addPoints(Point* points, uint32_t num_points)
       *iptr = color;
       ++fptr;
 
-      ROS_ASSERT((uint8_t*)fptr <= (uint8_t*)vdata + rend->getBuffer()->getNumVertices() * vertex_size);
+      // TODO: get this to work
+      //ROS_ASSERT((uint8_t*)fptr <= (uint8_t*)vdata + rend->getBuffer()->getNumVertices() * vertex_size);
     }
   }
 

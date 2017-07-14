@@ -77,12 +77,12 @@ void PolygonDisplay::reset()
   manual_object_->clear();
 }
 
-bool validateFloats( const geometry_msgs::PolygonStamped& msg )
+bool validateFloats( const geometry_msgs::msg::PolygonStamped& msg )
 {
   return validateFloats(msg.polygon.points);
 }
 
-void PolygonDisplay::processMessage(const geometry_msgs::PolygonStamped::ConstPtr& msg)
+void PolygonDisplay::processMessage(const geometry_msgs::msg::PolygonStamped::SharedPtr msg)
 {
   if( !validateFloats( *msg ))
   {
@@ -117,7 +117,7 @@ void PolygonDisplay::processMessage(const geometry_msgs::PolygonStamped::ConstPt
     manual_object_->begin( "BaseWhiteNoLighting", Ogre::RenderOperation::OT_LINE_STRIP );
     for( uint32_t i=0; i < num_points + 1; ++i )
     {
-      const geometry_msgs::Point32& msg_point = msg->polygon.points[ i % num_points ];
+      const geometry_msgs::msg::Point32& msg_point = msg->polygon.points[ i % num_points ];
       manual_object_->position( msg_point.x, msg_point.y, msg_point.z );
       manual_object_->colour( color );
     }

@@ -43,7 +43,7 @@ namespace rviz
 {
 
 //////////////
-bool validateFloats(const visualization_msgs::InteractiveMarker& msg)
+bool validateFloats(const visualization_msgs::msg::InteractiveMarker& msg)
 {
   bool valid = true;
   valid = valid && validateFloats(msg.pose);
@@ -69,8 +69,8 @@ InteractiveMarkerDisplay::InteractiveMarkerDisplay()
   : Display()
 {
   marker_update_topic_property_ = new RosTopicProperty( "Update Topic", "",
-                                                        ros::message_traits::datatype<visualization_msgs::InteractiveMarkerUpdate>(),
-                                                        "visualization_msgs::InteractiveMarkerUpdate topic to subscribe to.",
+                                                        ros::message_traits::datatype<visualization_msgs::msg::InteractiveMarkerUpdate>(),
+                                                        "visualization_msgs::msg::InteractiveMarkerUpdate topic to subscribe to.",
                                                         this, SLOT( updateTopic() ));
 
   show_descriptions_property_ = new BoolProperty( "Show Descriptions", true,
@@ -94,10 +94,10 @@ void InteractiveMarkerDisplay::onInitialize()
   tf::Transformer* tf = context_->getFrameManager()->getTFClient();
   im_client_.reset( new interactive_markers::InteractiveMarkerClient( *tf, fixed_frame_.toStdString() ) );
 
-  im_client_->setInitCb( boost::bind( &InteractiveMarkerDisplay::initCb, this, _1 ) );
-  im_client_->setUpdateCb( boost::bind( &InteractiveMarkerDisplay::updateCb, this, _1 ) );
-  im_client_->setResetCb( boost::bind( &InteractiveMarkerDisplay::resetCb, this, _1 ) );
-  im_client_->setStatusCb( boost::bind( &InteractiveMarkerDisplay::statusCb, this, _1, _2, _3 ) );
+  im_client_->setInitCb( std::bind( &InteractiveMarkerDisplay::initCb, this, std::placeholders::_1 ) );
+  im_client_->setUpdateCb( std::bind( &InteractiveMarkerDisplay::updateCb, this, std::placeholders::_1 ) );
+  im_client_->setResetCb( std::bind( &InteractiveMarkerDisplay::resetCb, this, std::placeholders::_1 ) );
+  im_client_->setStatusCb( std::bind( &InteractiveMarkerDisplay::statusCb, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 ) );
 
   client_id_ = ros::this_node::getName() + "/" + getNameStd();
 
@@ -145,11 +145,11 @@ void InteractiveMarkerDisplay::subscribe()
     im_client_->subscribe(topic_ns_);
 
     std::string feedback_topic = topic_ns_+"/feedback";
-    feedback_pub_ = update_nh_.advertise<visualization_msgs::InteractiveMarkerFeedback>( feedback_topic, 100, false );
+    feedback_pub_ = update_nh_.advertise<visualization_msgs::msg::InteractiveMarkerFeedback>( feedback_topic, 100, false );
   }
 }
 
-void InteractiveMarkerDisplay::publishFeedback(visualization_msgs::InteractiveMarkerFeedback &feedback)
+void InteractiveMarkerDisplay::publishFeedback(visualization_msgs::msg::InteractiveMarkerFeedback &feedback)
 {
   feedback.client_id = client_id_;
   feedback_pub_.publish( feedback );
@@ -199,14 +199,14 @@ InteractiveMarkerDisplay::M_StringToIMPtr& InteractiveMarkerDisplay::getImMap( s
 
 void InteractiveMarkerDisplay::updateMarkers(
     const std::string& server_id,
-    const std::vector<visualization_msgs::InteractiveMarker>& markers
+    const std::vector<visualization_msgs::msg::InteractiveMarker>& markers
     )
 {
   M_StringToIMPtr& im_map = getImMap( server_id );
 
   for ( size_t i=0; i<markers.size(); i++ )
   {
-    const visualization_msgs::InteractiveMarker& marker = markers[i];
+    const visualization_msgs::msg::InteractiveMarker& marker = markers[i];
 
     if ( !validateFloats( marker ) )
     {
@@ -222,9 +222,9 @@ void InteractiveMarkerDisplay::updateMarkers(
     {
       int_marker_entry = im_map.insert( std::make_pair(marker.name, IMPtr ( new InteractiveMarker(getSceneNode(), context_) ) ) ).first;
       connect( int_marker_entry->second.get(),
-               SIGNAL( userFeedback(visualization_msgs::InteractiveMarkerFeedback&) ),
+               SIGNAL( userFeedback(visualization_msgs::msg::InteractiveMarkerFeedback&) ),
                this,
-               SLOT( publishFeedback(visualization_msgs::InteractiveMarkerFeedback&) ));
+               SLOT( publishFeedback(visualization_msgs::msg::InteractiveMarkerFeedback&) ));
       connect( int_marker_entry->second.get(),
                SIGNAL( statusUpdate(StatusProperty::Level, const std::string&, const std::string&) ),
                this,
@@ -260,13 +260,13 @@ void InteractiveMarkerDisplay::eraseMarkers(
 
 void InteractiveMarkerDisplay::updatePoses(
     const std::string& server_id,
-    const std::vector<visualization_msgs::InteractiveMarkerPose>& marker_poses )
+    const std::vector<visualization_msgs::msg::InteractiveMarkerPose>& marker_poses )
 {
   M_StringToIMPtr& im_map = getImMap( server_id );
 
   for ( size_t i=0; i<marker_poses.size(); i++ )
   {
-    const visualization_msgs::InteractiveMarkerPose& marker_pose = marker_poses[i];
+    const visualization_msgs::msg::InteractiveMarkerPose& marker_pose = marker_poses[i];
 
     if ( !validateFloats( marker_pose.pose ) )
     {
@@ -289,13 +289,13 @@ void InteractiveMarkerDisplay::updatePoses(
   }
 }
 
-void InteractiveMarkerDisplay::initCb( visualization_msgs::InteractiveMarkerInitConstPtr msg )
+  void InteractiveMarkerDisplay::initCb( visualization_msgs::msg::InteractiveMarkerInit::SharedPtr msg )
 {
   resetCb( msg->server_id );
   updateMarkers( msg->server_id, msg->markers );
 }
 
-void InteractiveMarkerDisplay::updateCb( visualization_msgs::InteractiveMarkerUpdateConstPtr msg )
+void InteractiveMarkerDisplay::updateCb( visualization_msgs::msg::InteractiveMarkerUpdate::SharedPtr msg )
 {
   updateMarkers( msg->server_id, msg->markers );
   updatePoses( msg->server_id, msg->poses );

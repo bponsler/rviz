@@ -46,7 +46,7 @@ namespace ros
 class CallbackQueueInterface;
 }
 
-namespace tf
+namespace tf2_ros
 {
 class TransformListener;
 }
@@ -90,7 +90,7 @@ public:
   virtual FrameManager* getFrameManager() const = 0;
 
   /** @brief Convenience function: returns getFrameManager()->getTFClient(). */
-  virtual tf::TransformListener* getTFClient() const = 0;
+  virtual tf2_ros::TransformListener* getTFClient() const = 0;
 
   /** @brief Return the fixed frame name. */
   virtual QString getFixedFrame() const = 0;
@@ -106,10 +106,10 @@ public:
   virtual DisplayFactory* getDisplayFactory() const = 0;
 
   /** @brief Return the CallbackQueue using the main GUI thread. */
-  virtual ros::CallbackQueueInterface* getUpdateQueue() = 0;
+  //virtual ros::CallbackQueueInterface* getUpdateQueue() = 0; // TODO: fix callback queue
 
   /** @brief Return a CallbackQueue using a different thread than the main GUI one. */
-  virtual ros::CallbackQueueInterface* getThreadedQueue() = 0;
+  //virtual ros::CallbackQueueInterface* getThreadedQueue() = 0; // TODO: fix callback queue
 
   /** @brief Handle a single key event for a given RenderPanel. */
   virtual void handleChar( QKeyEvent* event, RenderPanel* panel ) = 0;

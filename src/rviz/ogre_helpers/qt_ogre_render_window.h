@@ -29,8 +29,6 @@
 #ifndef QT_OGRE_RENDER_WINDOW_OGRE_RENDER_WINDOW_H_
 #define QT_OGRE_RENDER_WINDOW_OGRE_RENDER_WINDOW_H_
 
-#include <boost/function.hpp>
-
 #include "render_widget.h"
 
 #include <OgreColourValue.h>
@@ -66,12 +64,12 @@ public:
    * Set a callback which is called before each render
    * @param func The callback functor
    */
-  virtual void setPreRenderCallback( boost::function<void ()> func );
+  virtual void setPreRenderCallback( std::function<void ()> func );
   /**
      * Set a callback which is called after each render
      * @param func The callback functor
      */
-  virtual void setPostRenderCallback( boost::function<void ()> func );
+  virtual void setPostRenderCallback( std::function<void ()> func );
 
   /** Overrides the default implementation.
   	This override is here for convenience. Returns a symbolic 320x240px size.
@@ -140,8 +138,8 @@ protected:
 
   Ogre::Root* ogre_root_;
 
-  boost::function<void ()> pre_render_callback_;      ///< Functor which is called before each render
-  boost::function<void ()> post_render_callback_;     ///< Functor which is called after each render
+  std::function<void ()> pre_render_callback_;      ///< Functor which is called before each render
+  std::function<void ()> post_render_callback_;     ///< Functor which is called after each render
 
   float ortho_scale_;
   bool auto_render_;

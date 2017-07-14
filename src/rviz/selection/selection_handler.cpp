@@ -32,7 +32,7 @@
 #include "properties/property.h"
 #include "visualization_manager.h"
 
-#include <ros/assert.h>
+#include <ros2_console/assert.hpp>
 
 #include <OgreSceneNode.h>
 #include <OgreSceneManager.h>

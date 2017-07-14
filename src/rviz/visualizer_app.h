@@ -33,8 +33,10 @@
 #include <QObject>
 
 #ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
-# include <ros/ros.h>
+# include <rclcpp/rclcpp.hpp>
 #endif
+
+#include <std_srvs/srv/empty.hpp>
 
 class QTimer;
 
@@ -66,8 +68,8 @@ private:
   QApplication* app_;
   QTimer* continue_timer_;
   VisualizationFrame* frame_;
-  ros::NodeHandlePtr nh_;
-  ros::ServiceServer reload_shaders_service_;
+  rclcpp::node::Node::SharedPtr nh_;
+  rclcpp::service::Service<std_srvs::srv::Empty>::SharedPtr reload_shaders_service_;
 };
 
 } // end namespace rviz

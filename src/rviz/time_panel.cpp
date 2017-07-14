@@ -165,7 +165,7 @@ void TimePanel::onDisplayAdded( Display* display )
   }
   else
   {
-    connect( display, SIGNAL( timeSignal( rviz::Display*, ros::Time ) ), this, SLOT( onTimeSignal( rviz::Display*, ros::Time ) ));
+    connect( display, SIGNAL( timeSignal( rviz::Display*, ros2_time::Time ) ), this, SLOT( onTimeSignal( rviz::Display*, ros2_time::Time ) ));
   }
 }
 
@@ -179,7 +179,7 @@ void TimePanel::onDisplayRemoved( Display* display )
   }
 }
 
-void TimePanel::onTimeSignal( Display* display, ros::Time time )
+void TimePanel::onTimeSignal( Display* display, ros2_time::Time time )
 {
   QString name = display->getName();
   int index = sync_source_selector_->findData( QVariant( (qulonglong)display ) );

@@ -27,8 +27,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <boost/bind.hpp>
-
 #include <OgreSceneNode.h>
 #include <OgreSceneManager.h>
 #include <OgreManualObject.h>
@@ -66,14 +64,14 @@ GridCellsDisplay::GridCellsDisplay()
   alpha_property_->setMax( 1 );
 
   topic_property_ = new RosTopicProperty( "Topic", "",
-                                          QString::fromStdString( ros::message_traits::datatype<nav_msgs::GridCells>() ),
-                                          "nav_msgs::GridCells topic to subscribe to.",
+                                          QString::fromStdString( ros::message_traits::datatype<nav_msgs::msg::GridCells>() ),
+                                          "nav_msgs::msg::GridCells topic to subscribe to.",
                                           this, SLOT( updateTopic() ));
 }
 
 void GridCellsDisplay::onInitialize()
 {
-  tf_filter_ = new tf::MessageFilter<nav_msgs::GridCells>( *context_->getTFClient(), fixed_frame_.toStdString(),
+  tf_filter_ = new tf::MessageFilter<nav_msgs::msg::GridCells>( *context_->getTFClient(), fixed_frame_.toStdString(),
                                                            10, update_nh_ );
   static int count = 0;
   std::stringstream ss;
@@ -87,7 +85,7 @@ void GridCellsDisplay::onInitialize()
   updateAlpha();
 
   tf_filter_->connectInput( sub_ );
-  tf_filter_->registerCallback( boost::bind( &GridCellsDisplay::incomingMessage, this, _1 ));
+  tf_filter_->registerCallback( std::bind( &GridCellsDisplay::incomingMessage, this, std::placeholders::_1 ));
   context_->getFrameManager()->registerFilterForTransformStatusCheck( tf_filter_, this );
 }
 
@@ -165,7 +163,7 @@ void GridCellsDisplay::fixedFrameChanged()
   tf_filter_->setTargetFrame( fixed_frame_.toStdString() );
 }
 
-bool validateFloats(const nav_msgs::GridCells& msg)
+  bool validateFloats(const nav_msgs::msg::GridCells& msg)
 {
   bool valid = true;
   valid = valid && validateFloats( msg.cell_width );
@@ -174,7 +172,7 @@ bool validateFloats(const nav_msgs::GridCells& msg)
   return valid;
 }
 
-void GridCellsDisplay::incomingMessage( const nav_msgs::GridCells::ConstPtr& msg )
+void GridCellsDisplay::incomingMessage( const nav_msgs::msg::GridCells::SharedPtr msg )
 {
   if( !msg )
   {

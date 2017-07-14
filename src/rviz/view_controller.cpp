@@ -31,12 +31,13 @@
 #include <QFont>
 #include <QKeyEvent>
 
-#include <OgreCamera.h>
-#include <OgreSceneManager.h>
-#include <OgreSceneNode.h>
+//#include <OgreCamera.h>
+//#include <OgreSceneManager.h>
+//#include <OgreSceneNode.h>
+#include <OgreVector3.h>
 
 #include "rviz/display_context.h"
-#include "rviz/frame_manager.h"
+//#include "rviz/frame_manager.h"
 #include "rviz/load_resource.h"
 #include "rviz/properties/enum_property.h"
 #include "rviz/properties/float_property.h"
@@ -231,7 +232,7 @@ void ViewController::handleKeyEvent( QKeyEvent* event, RenderPanel* panel )
 
 void ViewController::setCursor( CursorType cursor_type )
 {
-  cursor_=standard_cursors_[cursor_type];
+  //cursor_=standard_cursors_[cursor_type];  // TODO: fix this
 }
 
 void ViewController::lookAt( float x, float y, float z )

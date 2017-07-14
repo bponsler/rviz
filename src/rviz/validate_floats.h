@@ -32,12 +32,12 @@
 
 #include <cmath>
 
-#include <geometry_msgs/PointStamped.h>
-#include <geometry_msgs/Point32.h>
-#include <geometry_msgs/Vector3.h>
-#include <geometry_msgs/PoseStamped.h>
-#include <geometry_msgs/Twist.h>
-#include <std_msgs/ColorRGBA.h>
+#include <geometry_msgs/msg/point_stamped.hpp>
+#include <geometry_msgs/msg/point32.hpp>
+#include <geometry_msgs/msg/vector3.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
+#include <geometry_msgs/msg/twist.hpp>
+#include <std_msgs/msg/color_rgba.hpp>
 #include <OgreVector3.h>
 #include <OgreQuaternion.h>
 
@@ -75,7 +75,7 @@ inline bool validateFloats(const Ogre::Quaternion& quat)
   return valid;
 }
 
-inline bool validateFloats(const geometry_msgs::Point& msg)
+inline bool validateFloats(const geometry_msgs::msg::Point& msg)
 {
   bool valid = true;
   valid = valid && validateFloats(msg.x);
@@ -84,7 +84,7 @@ inline bool validateFloats(const geometry_msgs::Point& msg)
   return valid;
 }
 
-inline bool validateFloats(const geometry_msgs::Point32& msg)
+inline bool validateFloats(const geometry_msgs::msg::Point32& msg)
 {
   bool valid = true;
   valid = valid && validateFloats(msg.x);
@@ -93,7 +93,7 @@ inline bool validateFloats(const geometry_msgs::Point32& msg)
   return valid;
 }
 
-inline bool validateFloats(const geometry_msgs::Vector3& msg)
+inline bool validateFloats(const geometry_msgs::msg::Vector3& msg)
 {
   bool valid = true;
   valid = valid && validateFloats(msg.x);
@@ -102,7 +102,7 @@ inline bool validateFloats(const geometry_msgs::Vector3& msg)
   return valid;
 }
 
-inline bool validateFloats(const geometry_msgs::Twist& twist)
+inline bool validateFloats(const geometry_msgs::msg::Twist& twist)
 {
   bool valid = true;
   valid = valid && validateFloats(twist.linear);
@@ -110,7 +110,7 @@ inline bool validateFloats(const geometry_msgs::Twist& twist)
   return valid;
 }
 
-inline bool validateFloats(const geometry_msgs::Quaternion& msg)
+inline bool validateFloats(const geometry_msgs::msg::Quaternion& msg)
 {
   bool valid = true;
   valid = valid && validateFloats(msg.x);
@@ -120,7 +120,7 @@ inline bool validateFloats(const geometry_msgs::Quaternion& msg)
   return valid;
 }
 
-inline bool validateFloats(const std_msgs::ColorRGBA& msg)
+inline bool validateFloats(const std_msgs::msg::ColorRGBA& msg)
 {
   bool valid = true;
   valid = valid && validateFloats(msg.r);
@@ -130,12 +130,12 @@ inline bool validateFloats(const std_msgs::ColorRGBA& msg)
   return valid;
 }
 
-inline bool validateFloats(const geometry_msgs::PointStamped& msg)
+inline bool validateFloats(const geometry_msgs::msg::PointStamped& msg)
 {
   return validateFloats(msg.point);
 }
 
-inline bool validateFloats(const geometry_msgs::Pose& msg)
+inline bool validateFloats(const geometry_msgs::msg::Pose& msg)
 {
   bool valid = true;
   valid = valid && validateFloats(msg.position);
@@ -143,7 +143,7 @@ inline bool validateFloats(const geometry_msgs::Pose& msg)
   return valid;
 }
 
-inline bool validateFloats(const geometry_msgs::PoseStamped& msg)
+inline bool validateFloats(const geometry_msgs::msg::PoseStamped& msg)
 {
   return validateFloats(msg.pose);
 }

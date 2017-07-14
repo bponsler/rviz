@@ -27,8 +27,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ros/master.h"
-
 #include "rviz/properties/ros_topic_property.h"
 
 #include <QApplication>
@@ -63,6 +61,8 @@ void RosTopicProperty::fillTopicList()
 
   std::string std_message_type = message_type_.toStdString();
 
+  // TODO: need some way to get list of topics
+  /*
   ros::master::V_TopicInfo topics;
   ros::master::getTopics( topics );
 
@@ -78,6 +78,8 @@ void RosTopicProperty::fillTopicList()
       addOptionStd( topic.name );
     }
   }
+  */
+  
   sortOptions();
   QApplication::restoreOverrideCursor();
 }

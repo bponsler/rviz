@@ -28,7 +28,7 @@
  */
 
 #include "stl_loader.h"
-#include <ros/console.h>
+#include <ros2_console/console.hpp>
 
 #include <OgreManualObject.h>
 

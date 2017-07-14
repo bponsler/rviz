@@ -27,8 +27,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <ros/package.h>
-
 #include "rviz/display_context.h"
 #include "rviz/properties/property.h"
 #include "rviz/load_resource.h"

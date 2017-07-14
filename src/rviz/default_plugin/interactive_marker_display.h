@@ -39,7 +39,7 @@
 
 #ifndef Q_MOC_RUN
 #include <message_filters/subscriber.h>
-#include <tf/message_filter.h>
+#include <tf2_ros/message_filter.h>
 #include <interactive_markers/interactive_marker_client.h>
 #endif
 

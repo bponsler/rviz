@@ -29,8 +29,6 @@
 
 #include <stdint.h>
 
-#include <boost/bind.hpp>
-
 #include <OgreSceneNode.h>
 #include <OgreSceneManager.h>
 

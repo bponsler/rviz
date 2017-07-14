@@ -43,7 +43,7 @@
 #include <visualization_msgs/InteractiveMarker.h>
 #include <visualization_msgs/InteractiveMarkerPose.h>
 #include <visualization_msgs/InteractiveMarkerFeedback.h>
-#include <geometry_msgs/Pose.h>
+#include <geometry_msgs/msg/pose.hpp>
 
 #include <ros/publisher.h>
 

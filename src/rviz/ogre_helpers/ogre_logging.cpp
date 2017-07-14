@@ -30,7 +30,7 @@
 #include <OgreLogManager.h>
 #include <OgreLog.h>
 
-#include <ros/ros.h>
+#include <ros2_console/console.hpp>
 
 #include "rviz/ogre_helpers/ogre_logging.h"
 
@@ -50,7 +50,9 @@ public:
     {
       if ( lml >= min_lml )
       {
-        ROS_LOG((ros::console::levels::Level)(lml-1), ROSCONSOLE_DEFAULT_NAME, "%s", message.c_str() );
+	// TODO: support passing a log level
+        //ROS_LOG((ros::console::levels::Level)(lml-1), ROSCONSOLE_DEFAULT_NAME, "%s", message.c_str() );
+        ROS_DEBUG("%s", message.c_str() );	
       }
     }
    }
@@ -59,7 +61,9 @@ public:
   {
     if ( lml >= min_lml )
     {
-      ROS_LOG((ros::console::levels::Level)(lml-1), ROSCONSOLE_DEFAULT_NAME, "%s", message.c_str() );
+      // TODO: support passing a log level
+      // ROS_LOG((ros::console::levels::Level)(lml-1), ROSCONSOLE_DEFAULT_NAME, "%s", message.c_str() );
+      ROS_DEBUG("%s", message.c_str() );
     }
   }
 #endif

@@ -33,7 +33,7 @@
 
 #include <deque>
 
-#include <ros/time.h>
+#include <ros2_time/time.hpp>
 
 #include "rviz/bit_allocator.h"
 #include "rviz/config.h"
@@ -55,7 +55,7 @@ namespace ros
 class CallbackQueueInterface;
 }
 
-namespace tf
+namespace tf2_ros
 {
 class TransformListener;
 }
@@ -106,9 +106,9 @@ public:
    * @param render_panel a pointer to the main render panel widget of the app.
    * @param wm a pointer to the window manager (which is really just a
    *        VisualizationFrame, the top-level container widget of rviz).
-   * @param tf a pointer to tf::TransformListener which will be internally used by FrameManager.
+   * @param tf a pointer to tf2_ros::TransformListener which will be internally used by FrameManager.
    */
-  VisualizationManager( RenderPanel* render_panel, WindowManagerInterface* wm = 0, boost::shared_ptr<tf::TransformListener> tf = boost::shared_ptr<tf::TransformListener>() );
+  VisualizationManager( RenderPanel* render_panel, WindowManagerInterface* wm = 0, boost::shared_ptr<tf2_ros::TransformListener> tf = boost::shared_ptr<tf2_ros::TransformListener>() );
 
   /**
    * \brief Destructor
@@ -186,7 +186,7 @@ public:
   /**
    * @brief Convenience function: returns getFrameManager()->getTFClient().
    */
-  tf::TransformListener* getTFClient() const;
+  tf2_ros::TransformListener* getTFClient() const;
 
   /**
    * @brief Returns the Ogre::SceneManager used for the main RenderPanel.
@@ -276,12 +276,12 @@ public:
   /**
    * @brief Return the CallbackQueue using the main GUI thread.
    */
-  ros::CallbackQueueInterface* getUpdateQueue();
+  // ros::CallbackQueueInterface* getUpdateQueue();  // TODO: get callback queue if working
 
   /**
    * @brief Return a CallbackQueue using a different thread than the main GUI one.
    */
-  ros::CallbackQueueInterface* getThreadedQueue();
+  // ros::CallbackQueueInterface* getThreadedQueue();  // TODO: get callback queue if working
 
   /** @brief Return the FrameManager instance. */
   FrameManager* getFrameManager() const { return frame_manager_; }
@@ -333,7 +333,7 @@ protected Q_SLOTS:
    * This is the central place where update() is called on most rviz
    * objects.  Display objects, the FrameManager, the current
    * ViewController, the SelectionManager, PropertyManager.  Also
-   * calls ros::spinOnce(), so any callbacks on the global
+   * calls rclcpp::spin_once(), so any callbacks on the global
    * CallbackQueue get called from here as well.
    *
    * It is called at 30Hz from the update timer. */
@@ -353,8 +353,8 @@ protected:
   Ogre::SceneManager* scene_manager_;                     ///< Ogre scene manager associated with this panel
 
   QTimer* update_timer_;                                 ///< Update timer.  Display::update is called on each display whenever this timer fires
-  ros::Time last_update_ros_time_;                        ///< Update stopwatch.  Stores how long it's been since the last update
-  ros::WallTime last_update_wall_time_;
+  ros2_time::Time last_update_ros_time_;                        ///< Update stopwatch.  Stores how long it's been since the last update
+  ros2_time::WallTime last_update_wall_time_;
 
   volatile bool shutting_down_;
 
@@ -371,10 +371,10 @@ protected:
 
   RenderPanel* render_panel_;
 
-  ros::WallTime wall_clock_begin_;
-  ros::Time ros_time_begin_;
-  ros::WallDuration wall_clock_elapsed_;
-  ros::Duration ros_time_elapsed_;
+  ros2_time::WallTime wall_clock_begin_;
+  ros2_time::Time ros_time_begin_;
+  ros2_time::WallDuration wall_clock_elapsed_;
+  ros2_time::Duration ros_time_elapsed_;
 
   ColorProperty* background_color_property_;
 

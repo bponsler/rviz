@@ -5,7 +5,7 @@
 #include <boost/circular_buffer.hpp>
 #endif
 
-#include <geometry_msgs/PointStamped.h>
+#include <geometry_msgs/msg/point_stamped.hpp>
 #include <rviz/message_filter_display.h>
 
 
@@ -26,7 +26,7 @@ namespace rviz
 
     class PointStampedVisual;
 
-    class PointStampedDisplay: public rviz::MessageFilterDisplay<geometry_msgs::PointStamped>
+    class PointStampedDisplay: public rviz::MessageFilterDisplay<geometry_msgs::msg::PointStamped>
     {
     Q_OBJECT
     public:
@@ -47,7 +47,7 @@ namespace rviz
 
 	// Function to handle an incoming ROS message.
     private:
-	void processMessage( const geometry_msgs::PointStamped::ConstPtr& msg );
+	void processMessage( const geometry_msgs::msg::PointStamped::SharedPtr msg );
 
         // Storage for the list of visuals.  It is a circular buffer where
         // data gets popped from the front (oldest) and pushed to the back (newest)

@@ -34,7 +34,7 @@
 #include <OgreSceneNode.h>
 
 #include <message_filters/subscriber.h>
-#include <tf/message_filter.h>
+#include <tf2_ros/message_filter.h>
 #endif
 
 #include "rviz/display_context.h"
@@ -102,7 +102,7 @@ public:
                                                        fixed_frame_.toStdString(), 10, update_nh_ );
 
       tf_filter_->connectInput( sub_ );
-      tf_filter_->registerCallback( boost::bind( &MessageFilterDisplay<MessageType>::incomingMessage, this, _1 ));
+      tf_filter_->registerCallback( std::bind( &MessageFilterDisplay<MessageType>::incomingMessage, this, std::placeholders::_1 ));
       context_->getFrameManager()->registerFilterForTransformStatusCheck( tf_filter_, this );
     }
 

@@ -28,8 +28,6 @@
  */
 
 
-#include <boost/bind.hpp>
-
 #include <tf/transform_listener.h>
 
 #include "rviz/frame_manager.h"
@@ -97,7 +95,7 @@ void OdometryDisplay::onInitialize()
                                                           5, update_nh_ );
 
   tf_filter_->connectInput( sub_ );
-  tf_filter_->registerCallback( boost::bind( &OdometryDisplay::incomingMessage, this, _1 ));
+  tf_filter_->registerCallback( std::bind( &OdometryDisplay::incomingMessage, this, std::placeholders::_1 ));
   context_->getFrameManager()->registerFilterForTransformStatusCheck( tf_filter_, this );
 }
 

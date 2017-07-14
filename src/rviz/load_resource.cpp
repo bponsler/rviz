@@ -30,8 +30,9 @@
 #include "load_resource.h"
 
 #include <boost/filesystem.hpp>
-#include <ros/package.h>
-#include <ros/ros.h>
+#include <rospack/rospack.h>
+#include <rclcpp/rclcpp.hpp>
+#include <ros2_console/console.hpp>
 
 #include <QPixmapCache>
 #include <QPainter>
@@ -47,7 +48,17 @@ boost::filesystem::path getPath( QString url )
   {
     QString package_name = url.section('/',2,2);
     QString file_name = url.section('/',3);
-    path = ros::package::getPath(package_name.toStdString());
+
+    rospack::Rospack rp;
+    std::vector<std::string> search_path;
+    if(rp.getSearchPathFromEnv(search_path)) {
+      rp.crawl(search_path, false);
+      std::string pkg_path;
+      if (rp.find(package_name.toStdString(), pkg_path)) {
+	path = pkg_path;
+      }
+    }
+    
     path = path / file_name.toStdString();
   }
   else if ( url.indexOf("file://", 0, Qt::CaseInsensitive) == 0 )

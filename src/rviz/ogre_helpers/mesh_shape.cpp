@@ -36,7 +36,7 @@
 #include <OgreMaterialManager.h>
 #include <OgreManualObject.h>
 
-#include <ros/console.h>
+#include <ros2_console/console.hpp>
 #include <boost/lexical_cast.hpp>
 
 namespace rviz

@@ -27,8 +27,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <boost/bind.hpp>
-
 #include <OgreManualObject.h>
 #include <OgreMaterialManager.h>
 #include <OgreSceneManager.h>

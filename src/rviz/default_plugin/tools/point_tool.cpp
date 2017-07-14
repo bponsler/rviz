@@ -42,7 +42,7 @@
 #include "rviz/properties/bool_property.h"
 #include "rviz/properties/string_property.h"
 
-#include <geometry_msgs/PointStamped.h>
+#include <geometry_msgs/msg/point_stamped.hpp>
 
 #include <sstream>
 
@@ -83,7 +83,7 @@ void PointTool::deactivate()
 
 void PointTool::updateTopic()
 {
-  pub_ = nh_.advertise<geometry_msgs::PointStamped>( topic_property_->getStdString(), 1 );
+  pub_ = nh_.advertise<geometry_msgs::msg::PointStamped>( topic_property_->getStdString(), 1 );
 }
 
 void PointTool::updateAutoDeactivate()
@@ -108,12 +108,12 @@ int PointTool::processMouseEvent( ViewportMouseEvent& event )
 
     if( event.leftUp() )
     {
-      geometry_msgs::PointStamped ps;
+      geometry_msgs::msg::PointStamped ps;
       ps.point.x = pos.x;
       ps.point.y = pos.y;
       ps.point.z = pos.z;
       ps.header.frame_id = context_->getFixedFrame().toStdString();
-      ps.header.stamp = ros::Time::now();
+      ps.header.stamp = ros2_time::Time::now();
       pub_.publish( ps );
 
       if ( auto_deactivate_property_->getBool() )

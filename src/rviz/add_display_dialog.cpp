@@ -31,8 +31,8 @@
 
 #include <boost/filesystem.hpp>
 
-#include <ros/package.h>
-#include <ros/ros.h>
+#include <rospack/rospack.h>
+#include <rclcpp/rclcpp.hpp>
 
 #include <QGroupBox>
 #include <QLabel>

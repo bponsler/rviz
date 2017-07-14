@@ -37,7 +37,7 @@
 #include <OgrePixelFormat.h>
 #include <OgreColourValue.h>
 
-#include <ros/console.h>
+#include <ros2_console/console.hpp>
 
 
 namespace rviz

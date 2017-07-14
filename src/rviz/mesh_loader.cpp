@@ -50,8 +50,8 @@
 
 #include <tinyxml.h>
 
-
-#include <ros/assert.h>
+#include <ros2_console/console.hpp>
+#include <ros2_console/assert.hpp>
 
 #if defined(ASSIMP_UNIFIED_HEADER_NAMES)
 #include <assimp/Importer.hpp>
@@ -68,6 +68,10 @@
 #endif
 
 namespace fs = boost::filesystem;
+
+#ifndef ROS_PACKAGE_NAME
+#define ROS_PACKAGE_NAME "rviz"
+#endif
 
 namespace rviz
 {

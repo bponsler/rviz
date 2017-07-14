@@ -38,8 +38,8 @@
 #include <OgreGpuProgramManager.h>
 #include <OgreRenderTargetListener.h>
 
-#include <ros/console.h>
-#include <ros/assert.h>
+#include <ros2_console/console.hpp>
+#include <ros2_console/assert.hpp>
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
 #include <stdlib.h>
@@ -288,12 +288,12 @@ void QtOgreRenderWindow::setOrthoScale( float scale )
   setCameraAspectRatio();
 }
 
-void QtOgreRenderWindow::setPreRenderCallback( boost::function<void ()> func )
+void QtOgreRenderWindow::setPreRenderCallback( std::function<void ()> func )
 {
   pre_render_callback_ = func;
 }
 
-void QtOgreRenderWindow::setPostRenderCallback( boost::function<void ()> func )
+void QtOgreRenderWindow::setPostRenderCallback( std::function<void ()> func )
 {
   post_render_callback_ = func;
 }

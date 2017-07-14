@@ -30,8 +30,8 @@
 #ifndef RVIZ_FLUID_PRESSURE_DISPLAY_H
 #define RVIZ_FLUID_PRESSURE_DISPLAY_H
 
-#include <sensor_msgs/FluidPressure.h>
-#include <sensor_msgs/PointCloud2.h>
+#include <sensor_msgs/msg/fluid_pressure.hpp>
+#include <sensor_msgs/msg/point_cloud2.hpp>
 
 #include "rviz/message_filter_display.h"
 
@@ -43,10 +43,10 @@ class PointCloudCommon;
 
 /**
  * \class FluidPressureDisplay
- * \brief Displays an FluidPressure message of type sensor_msgs::FluidPressure
+ * \brief Displays an FluidPressure message of type sensor_msgs::msg::FluidPressure
  *
  */
-class FluidPressureDisplay: public MessageFilterDisplay<sensor_msgs::FluidPressure>
+class FluidPressureDisplay: public MessageFilterDisplay<sensor_msgs::msg::FluidPressure>
 {
 Q_OBJECT
 public:
@@ -65,7 +65,7 @@ protected:
   virtual void onInitialize();
 
   /** @brief Process a single message.  Overridden from MessageFilterDisplay. */
-  virtual void processMessage( const sensor_msgs::FluidPressureConstPtr& msg );
+  virtual void processMessage( const sensor_msgs::msg::FluidPressure::SharedPtr msg );
 
   IntProperty* queue_size_property_;
 

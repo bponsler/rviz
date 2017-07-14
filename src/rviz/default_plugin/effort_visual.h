@@ -1,7 +1,7 @@
 #ifndef EFFORT_VISUAL_H
 #define EFFORT_VISUAL_H
 
-#include <sensor_msgs/JointState.h>
+#include <sensor_msgs/msg/joint_state.hpp>
 
 namespace Ogre
 {
@@ -25,7 +25,7 @@ namespace rviz
 
 
 // Each instance of EffortVisual represents the visualization of a single
-// sensor_msgs::Effort message.  Currently it just shows an arrow with
+// sensor_msgs::msg::Effort message.  Currently it just shows an arrow with
 // the direction and magnitude of the acceleration vector, but could
 // easily be expanded to include more of the message data.
 class EffortVisual
@@ -41,7 +41,7 @@ public:
     // set rainbow color
     void getRainbowColor(float value, Ogre::ColourValue& color);
     // Configure the visual to show the data in the message.
-    void setMessage( const sensor_msgs::JointStateConstPtr& msg );
+    void setMessage( const sensor_msgs::msg::JointState::SharedPtr msg );
 
     // Set the pose of the coordinate frame the message refers to.
     // These could be done inside setMessage(), but that would require

@@ -78,7 +78,7 @@ namespace rviz
     }
 
     // This is our callback to handle an incoming message.
-    void PointStampedDisplay::processMessage( const geometry_msgs::PointStamped::ConstPtr& msg )
+    void PointStampedDisplay::processMessage( const geometry_msgs::msg::PointStamped::SharedPtr msg )
     {
 
         if( !rviz::validateFloats( msg->point ))

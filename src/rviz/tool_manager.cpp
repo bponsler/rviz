@@ -30,7 +30,7 @@
 #include <QKeyEvent>
 #include <QRegExp>
 
-#include <ros/assert.h>
+#include <ros2_console/assert.hpp>
 
 #include "rviz/failed_tool.h"
 #include "rviz/properties/property.h"

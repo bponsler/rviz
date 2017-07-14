@@ -1,7 +1,7 @@
 #ifndef POINT_VISUAL_H
 #define POINT_VISUAL_H
 
-#include <geometry_msgs/PointStamped.h>
+#include <geometry_msgs/msg/point_stamped.hpp>
 
 namespace Ogre
 {
@@ -35,7 +35,7 @@ public:
     // set rainbow color
     void getRainbowColor(float value, Ogre::ColourValue& color);
     // Configure the visual to show the data in the message.
-    void setMessage( const geometry_msgs::PointStamped::ConstPtr& msg  );
+    void setMessage( const geometry_msgs::msg::PointStamped::SharedPtr msg  );
 
     // Set the pose of the coordinate frame the message refers to.
     // These could be done inside setMessage(), but that would require

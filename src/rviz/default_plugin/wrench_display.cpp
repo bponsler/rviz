@@ -102,13 +102,13 @@ void WrenchStampedDisplay::updateHistoryLength()
     visuals_.rset_capacity(history_length_property_->getInt());
 }
 
-bool validateFloats( const geometry_msgs::WrenchStamped& msg )
+bool validateFloats( const geometry_msgs::msg::WrenchStamped& msg )
 {
     return rviz::validateFloats(msg.wrench.force) && rviz::validateFloats(msg.wrench.torque) ;
 }
 
 // This is our callback to handle an incoming message.
-void WrenchStampedDisplay::processMessage( const geometry_msgs::WrenchStamped::ConstPtr& msg )
+void WrenchStampedDisplay::processMessage( const geometry_msgs::msg::WrenchStamped::SharedPtr msg )
 {
     if( !validateFloats( *msg ))
     {

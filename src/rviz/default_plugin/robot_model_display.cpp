@@ -193,7 +193,7 @@ void RobotModelDisplay::load()
   setStatus( StatusProperty::Ok, "URDF", "URDF parsed OK" );
   robot_->load( descr );
   robot_->update( TFLinkUpdater( context_->getFrameManager(),
-                                 boost::bind( linkUpdaterStatusFunction, _1, _2, _3, this ),
+                                 std::bind( linkUpdaterStatusFunction, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, this ),
                                  tf_prefix_property_->getStdString() ));
 }
 
@@ -218,7 +218,7 @@ void RobotModelDisplay::update( float wall_dt, float ros_dt )
   if( has_new_transforms_ || update )
   {
     robot_->update( TFLinkUpdater( context_->getFrameManager(),
-                                   boost::bind( linkUpdaterStatusFunction, _1, _2, _3, this ),
+                                   std::bind( linkUpdaterStatusFunction, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, this ),
                                    tf_prefix_property_->getStdString() ));
     context_->queueRender();
 

@@ -50,7 +50,7 @@ namespace tf
 public:
 	typedef boost::shared_ptr<M const> MConstPtr;
 	typedef ros::MessageEvent<M const> MEvent;
-	typedef boost::function<void(const MConstPtr&, FilterFailureReason)> FailureCallback;
+	typedef std::function<void(const MConstPtr&, FilterFailureReason)> FailureCallback;
 #ifdef RVIZ_USE_BOOST_SIGNAL_1
 	typedef boost::signal<void(const MConstPtr&, FilterFailureReason)> FailureSignal;
 #else
@@ -243,7 +243,7 @@ public:
 	message_filters::Connection registerFailureCallback(const FailureCallback& callback)
 	    {
 		boost::mutex::scoped_lock lock(failure_signal_mutex_);
-		return message_filters::Connection(boost::bind(&MessageFilterJointState::disconnectFailure, this, _1), failure_signal_.connect(callback));
+		return message_filters::Connection(std::bind(&MessageFilterJointState::disconnectFailure, this, std::placeholders::_1), failure_signal_.connect(callback));
 	    }
 
 	virtual void setQueueSize( uint32_t new_queue_size )
@@ -272,7 +272,7 @@ public:
 		warned_about_unresolved_name_ = false;
 		warned_about_empty_frame_id_ = false;
 
-		tf_connection_ = tf_.addTransformsChangedListener(boost::bind(&MessageFilterJointState::transformsChanged, this));
+		tf_connection_ = tf_.addTransformsChangedListener(std::bind(&MessageFilterJointState::transformsChanged, this));
 
 		max_rate_timer_ = nh_.createTimer(max_rate_, &MessageFilterJointState::maxRateTimerCallback, this);
 	    }
@@ -510,7 +510,7 @@ public:
 
 #ifndef Q_MOC_RUN
 #include <message_filters/subscriber.h>
-#include <tf/message_filter.h>
+#include <tf2_ros/message_filter.h>
 #endif
 
 #include "rviz/display_context.h"
@@ -548,7 +548,7 @@ public:
                                                     fixed_frame_.toStdString(), 10, update_nh_ );
 
       tf_filter_->connectInput( sub_ );
-      tf_filter_->registerCallback( boost::bind( &MessageFilterJointStateDisplay::incomingMessage, this, _1 ));
+      tf_filter_->registerCallback( std::bind( &MessageFilterJointStateDisplay::incomingMessage, this, _1 ));
       context_->getFrameManager()->registerFilterForTransformStatusCheck( tf_filter_, this );
     }
 

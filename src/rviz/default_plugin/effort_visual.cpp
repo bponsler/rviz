@@ -5,7 +5,7 @@
 #include <rviz/ogre_helpers/arrow.h>
 #include <rviz/ogre_helpers/billboard_line.h>
 
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 
 #include <urdf/model.h>
 #include "effort_visual.h"
@@ -72,7 +72,7 @@ namespace rviz
 	else if (i >= 5) color[0] = 1, color[1] = n, color[2] = 0;
     }
 
-    void EffortVisual::setMessage( const sensor_msgs::JointStateConstPtr& msg )
+    void EffortVisual::setMessage( const sensor_msgs::msg::JointState::SharedPtr msg )
     {
 	// for all joints...
 	int joint_num = msg->name.size();

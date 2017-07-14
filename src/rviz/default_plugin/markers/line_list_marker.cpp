@@ -86,8 +86,8 @@ void LineListMarker::onNewMessage(const MarkerConstPtr& old_message, const Marke
     lines_->setNumLines(new_message->points.size() / 2);
 
     size_t i = 0;
-    std::vector<geometry_msgs::Point>::const_iterator it = new_message->points.begin();
-    std::vector<geometry_msgs::Point>::const_iterator end = new_message->points.end();
+    std::vector<geometry_msgs::msg::Point>::const_iterator it = new_message->points.begin();
+    std::vector<geometry_msgs::msg::Point>::const_iterator end = new_message->points.end();
     for ( ; it != end; )
     {
       if (it != new_message->points.begin())
@@ -97,7 +97,7 @@ void LineListMarker::onNewMessage(const MarkerConstPtr& old_message, const Marke
 
       for (uint32_t j = 0; j < 2; ++j, ++it, ++i)
       {
-        const geometry_msgs::Point& p = *it;
+        const geometry_msgs::msg::Point& p = *it;
 
         Ogre::ColourValue c;
         if (has_per_point_color)

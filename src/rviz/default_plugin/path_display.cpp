@@ -269,7 +269,7 @@ void PathDisplay::processMessage( const nav_msgs::Path::ConstPtr& msg )
     manual_object->begin( "BaseWhiteNoLighting", Ogre::RenderOperation::OT_LINE_STRIP );
     for( uint32_t i=0; i < num_points; ++i)
     {
-      const geometry_msgs::Point& pos = msg->poses[ i ].pose.position;
+      const geometry_msgs::msg::Point& pos = msg->poses[ i ].pose.position;
       Ogre::Vector3 xpos = transform * Ogre::Vector3( pos.x, pos.y, pos.z );
       manual_object->position( xpos.x, xpos.y, xpos.z );
       manual_object->colour( color );
@@ -285,7 +285,7 @@ void PathDisplay::processMessage( const nav_msgs::Path::ConstPtr& msg )
 
     for( uint32_t i=0; i < num_points; ++i)
     {
-      const geometry_msgs::Point& pos = msg->poses[ i ].pose.position;
+      const geometry_msgs::msg::Point& pos = msg->poses[ i ].pose.position;
       Ogre::Vector3 xpos = transform * Ogre::Vector3( pos.x, pos.y, pos.z );
       billboard_line->addPoint( xpos, color );
     }

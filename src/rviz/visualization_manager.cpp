@@ -34,8 +34,6 @@
 #include <QPixmap>
 #include <QTimer>
 
-#include <boost/bind.hpp>
-
 #include <OgreRoot.h>
 #include <OgreSceneManager.h>
 #include <OgreSceneNode.h>
@@ -49,10 +47,11 @@
 
 #include <boost/filesystem.hpp>
 
-#include <tf/transform_listener.h>
+#include <tf2_ros/transform_listener.h>
 
-#include <ros/package.h>
-#include <ros/callback_queue.h>
+#include <ros2_time/time.hpp>
+#include <rospack/rospack.h>
+//#include <ros/callback_queue.h>
 
 #include "rviz/display.h"
 #include "rviz/display_factory.h"
@@ -107,14 +106,14 @@ private:
 class VisualizationManagerPrivate
 {
 public:
-  ros::CallbackQueue threaded_queue_;
+  //ros::CallbackQueue threaded_queue_;
   boost::thread_group threaded_queue_threads_;
-  ros::NodeHandle update_nh_;
-  ros::NodeHandle threaded_nh_;
+  rclcpp::node::Node::SharedPtr update_nh_;
+  rclcpp::node::Node::SharedPtr threaded_nh_;
   boost::mutex render_mutex_;
 };
 
-VisualizationManager::VisualizationManager( RenderPanel* render_panel, WindowManagerInterface* wm, boost::shared_ptr<tf::TransformListener> tf )
+VisualizationManager::VisualizationManager( RenderPanel* render_panel, WindowManagerInterface* wm, boost::shared_ptr<tf2_ros::TransformListener> tf )
 : ogre_root_( Ogre::Root::getSingletonPtr() )
 , update_timer_(0)
 , shutting_down_(false)
@@ -131,7 +130,7 @@ VisualizationManager::VisualizationManager( RenderPanel* render_panel, WindowMan
 
   render_panel->setAutoRender(false);
 
-  private_->threaded_nh_.setCallbackQueue(&private_->threaded_queue_);
+  //private_->threaded_nh_.setCallbackQueue(&private_->threaded_queue_); // TODO: fix this
 
   scene_manager_ = ogre_root_->createSceneManager( Ogre::ST_GENERIC );
 
@@ -185,7 +184,7 @@ VisualizationManager::VisualizationManager( RenderPanel* render_panel, WindowMan
 
   selection_manager_ = new SelectionManager(this);
 
-  private_->threaded_queue_threads_.create_thread(boost::bind(&VisualizationManager::threadedQueueThreadFunc, this));
+  private_->threaded_queue_threads_.create_thread(std::bind(&VisualizationManager::threadedQueueThreadFunc, this));
 
   display_factory_ = new DisplayFactory();
 
@@ -232,14 +231,16 @@ void VisualizationManager::initialize()
   selection_manager_->initialize();
   tool_manager_->initialize();
 
-  last_update_ros_time_ = ros::Time::now();
-  last_update_wall_time_ = ros::WallTime::now();
+  last_update_ros_time_ = ros2_time::Time::now();
+  last_update_wall_time_ = ros2_time::WallTime::now();
 }
 
+/**  // TODO: get callback queue interface working
 ros::CallbackQueueInterface* VisualizationManager::getThreadedQueue()
 {
   return &private_->threaded_queue_;
 }
+*/
 
 void VisualizationManager::lockRender()
 {
@@ -251,10 +252,12 @@ void VisualizationManager::unlockRender()
   private_->render_mutex_.unlock();
 }
 
+/** // TODO: get callbackqueue interface working
 ros::CallbackQueueInterface* VisualizationManager::getUpdateQueue()
 {
   return ros::getGlobalCallbackQueue();
 }
+*/
 
 void VisualizationManager::startUpdate()
 {
@@ -269,7 +272,7 @@ void VisualizationManager::stopUpdate()
 
 void createColorMaterial(const std::string& name, const Ogre::ColourValue& color, bool use_self_illumination)
 {
-  Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().create( name, ROS_PACKAGE_NAME );
+  Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().create( name, "rviz" );
   mat->setAmbient(color * 0.5f);
   mat->setDiffuse(color);
   if( use_self_illumination )
@@ -299,19 +302,21 @@ void VisualizationManager::queueRender()
 
 void VisualizationManager::onUpdate()
 {
-  ros::WallDuration wall_diff = ros::WallTime::now() - last_update_wall_time_;
-  ros::Duration ros_diff = ros::Time::now() - last_update_ros_time_;
+  ros2_time::WallDuration wall_diff = ros2_time::WallTime::now() - last_update_wall_time_;
+  ros2_time::Duration ros_diff = ros2_time::Time::now() - last_update_ros_time_;
   float wall_dt = wall_diff.toSec();
   float ros_dt = ros_diff.toSec();
-  last_update_ros_time_ = ros::Time::now();
-  last_update_wall_time_ = ros::WallTime::now();
+  last_update_ros_time_ = ros2_time::Time::now();
+  last_update_wall_time_ = ros2_time::WallTime::now();
 
   if(ros_dt < 0.0)
   {
     resetTime();
   }
 
-  ros::spinOnce();
+  rclcpp::node::Node::SharedPtr nh = rclcpp::node::Node::make_shared(
+      "rviz_visualization_manager");
+  rclcpp::spin_some(nh); // TODO: is this the equivalent of spin_once?
 
   Q_EMIT preUpdate();
 
@@ -367,28 +372,29 @@ void VisualizationManager::updateTime()
 {
   if( ros_time_begin_.isZero() )
   {
-    ros_time_begin_ = ros::Time::now();
+    ros_time_begin_ = ros2_time::Time::now();
   }
 
-  ros_time_elapsed_ = ros::Time::now() - ros_time_begin_;
+  ros_time_elapsed_ = ros2_time::Time::now() - ros_time_begin_;
 
   if( wall_clock_begin_.isZero() )
   {
-    wall_clock_begin_ = ros::WallTime::now();
+    wall_clock_begin_ = ros2_time::WallTime::now();
   }
 
-  wall_clock_elapsed_ = ros::WallTime::now() - wall_clock_begin_;
+  wall_clock_elapsed_ = ros2_time::WallTime::now() - wall_clock_begin_;
 }
 
 void VisualizationManager::updateFrames()
 {
   typedef std::vector<std::string> V_string;
   V_string frames;
-  frame_manager_->getTFClient()->getFrameStrings( frames );
+  // TODO: get frame strings from tf
+  //frame_manager_->getTFClient()->getFrameStrings( frames );
 
   // Check the fixed frame to see if it's ok
   std::string error;
-  if( frame_manager_->frameHasProblems( getFixedFrame().toStdString(), ros::Time(), error ))
+  if( frame_manager_->frameHasProblems( getFixedFrame().toStdString(), ros2_time::Time(), error ))
   {
     if( frames.empty() )
     {
@@ -410,7 +416,7 @@ void VisualizationManager::updateFrames()
   }
 }
 
-tf::TransformListener* VisualizationManager::getTFClient() const
+tf2_ros::TransformListener* VisualizationManager::getTFClient() const
 {
   return frame_manager_->getTFClient();
 }
@@ -418,10 +424,10 @@ tf::TransformListener* VisualizationManager::getTFClient() const
 void VisualizationManager::resetTime()
 {
   root_display_group_->reset();
-  frame_manager_->getTFClient()->clear();
+  //frame_manager_->getTFClient()->clear();  // TODO: clear tf
 
-  ros_time_begin_ = ros::Time();
-  wall_clock_begin_ = ros::WallTime();
+  ros_time_begin_ = ros2_time::Time();
+  wall_clock_begin_ = ros2_time::WallTime();
 
   queueRender();
 }
@@ -480,7 +486,7 @@ Display* VisualizationManager::createDisplay( const QString& class_lookup_name,
 
 double VisualizationManager::getWallClock()
 {
-  return ros::WallTime::now().toSec();
+  return ros2_time::WallTime::now().toSec();
 }
 
 double VisualizationManager::getROSTime()
@@ -548,10 +554,12 @@ void VisualizationManager::handleChar( QKeyEvent* event, RenderPanel* panel )
 
 void VisualizationManager::threadedQueueThreadFunc()
 {
+  /* // TODO: fix this
   while (!shutting_down_)
   {
-    private_->threaded_queue_.callOne(ros::WallDuration(0.1));
+    private_->threaded_queue_.callOne(ros2_time::WallDuration(0.1));
   }
+  */
 }
 
 void VisualizationManager::notifyConfigChanged()

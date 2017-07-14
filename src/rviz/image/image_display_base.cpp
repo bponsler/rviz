@@ -49,8 +49,8 @@ ImageDisplayBase::ImageDisplayBase() :
     , messages_received_(0)
 {
   topic_property_ = new RosTopicProperty("Image Topic", "",
-                                         QString::fromStdString(ros::message_traits::datatype<sensor_msgs::Image>()),
-                                         "sensor_msgs::Image topic to subscribe to.", this, SLOT( updateTopic() ));
+                                         QString::fromStdString(ros::message_traits::datatype<sensor_msgs::msg::Image>()),
+                                         "sensor_msgs::msg::Image topic to subscribe to.", this, SLOT( updateTopic() ));
 
   transport_property_ = new EnumProperty("Transport Hint", "raw", "Preferred method of sending images.", this,
                                          SLOT( updateTopic() ));
@@ -87,7 +87,7 @@ void ImageDisplayBase::onInitialize()
 
 void ImageDisplayBase::setTopic( const QString &topic, const QString &datatype )
 {
-  if ( datatype == ros::message_traits::datatype<sensor_msgs::Image>() )
+  if ( datatype == ros::message_traits::datatype<sensor_msgs::msg::Image>() )
   {
     transport_property_->setStdString( "raw" );
     topic_property_->setString( topic );
@@ -110,7 +110,7 @@ void ImageDisplayBase::setTopic( const QString &topic, const QString &datatype )
 }
 
 
-void ImageDisplayBase::incomingMessage(const sensor_msgs::Image::ConstPtr& msg)
+void ImageDisplayBase::incomingMessage(const sensor_msgs::msg::Image::SharedPtr msg)
 {
   if (!msg || context_->getFrameManager()->getPause() )
   {
@@ -172,12 +172,12 @@ void ImageDisplayBase::subscribe()
 
       if (targetFrame_.empty())
       {
-        sub_->registerCallback(boost::bind(&ImageDisplayBase::incomingMessage, this, _1));
+        sub_->registerCallback(std::bind(&ImageDisplayBase::incomingMessage, this, std::placeholders::_1));
       }
       else
       {
-        tf_filter_.reset( new tf::MessageFilter<sensor_msgs::Image>(*sub_, (tf::Transformer&)*(context_->getTFClient()), targetFrame_, (uint32_t)queue_size_property_->getInt(), update_nh_));
-        tf_filter_->registerCallback(boost::bind(&ImageDisplayBase::incomingMessage, this, _1));
+        tf_filter_.reset( new tf::MessageFilter<sensor_msgs::msg::Image>(*sub_, (tf::Transformer&)*(context_->getTFClient()), targetFrame_, (uint32_t)queue_size_property_->getInt(), update_nh_));
+        tf_filter_->registerCallback(std::bind(&ImageDisplayBase::incomingMessage, this, std::placeholders::_1));
       }
     }
     setStatus(StatusProperty::Ok, "Topic", "OK");

@@ -40,7 +40,7 @@
 # include <sensor_msgs/CameraInfo.h>
 
 # include <message_filters/subscriber.h>
-# include <tf/message_filter.h>
+# include <tf2_ros/message_filter.h>
 
 # include "rviz/image/image_display_base.h"
 # include "rviz/image/ros_image_texture.h"

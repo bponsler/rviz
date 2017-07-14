@@ -48,16 +48,15 @@
 #include <QToolButton>
 #include <QHBoxLayout>
 
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/trim.hpp>
-#include <boost/bind.hpp>
+//#include <boost/algorithm/string/split.hpp>
+//#include <boost/algorithm/string/trim.hpp>
 #include <boost/filesystem.hpp>
 
-#include <ros/console.h>
-#include <ros/package.h>
-#include <ros/init.h>
+#include <ros2_console/console.hpp>
+#include <rospack/rospack.h>
+#include <rclcpp/rclcpp.hpp>
 
-#include <OgreRenderWindow.h>
+//#include <OgreRenderWindow.h>
 #include <OgreMeshManager.h>
 
 #include <ogre_helpers/initialization.h>
@@ -133,7 +132,16 @@ VisualizationFrame::VisualizationFrame( QWidget* parent )
   post_load_timer_->setSingleShot( true );
   connect( post_load_timer_, SIGNAL( timeout() ), this, SLOT( markLoadingDone() ));
 
-  package_path_ = ros::package::getPath("rviz");
+  rospack::Rospack rp;
+  std::vector<std::string> search_path;
+  if(!rp.getSearchPathFromEnv(search_path)) {
+    throw std::runtime_error("Failed to find package search path: rviz");
+  }
+  rp.crawl(search_path, false);
+  if (!rp.find("rviz", package_path_)) {
+    throw std::runtime_error("Failed to find package: rviz");
+  }
+  
   help_path_ = QString::fromStdString( (fs::path(package_path_) / "help/help.html").BOOST_FILE_STRING() );
   splash_path_ = QString::fromStdString( (fs::path(package_path_) / "images/splash.png").BOOST_FILE_STRING() );
 
@@ -182,13 +190,13 @@ void VisualizationFrame::setStatus( const QString & message )
 void VisualizationFrame::updateFps()
 {
   frame_count_ ++;
-  ros::WallDuration wall_diff = ros::WallTime::now() - last_fps_calc_time_;
+  ros2_time::WallDuration wall_diff = ros2_time::WallTime::now() - last_fps_calc_time_;
 
   if ( wall_diff.toSec() > 1.0 )
   {
     float fps = frame_count_ / wall_diff.toSec();
     frame_count_ = 0;
-    last_fps_calc_time_ = ros::WallTime::now();
+    last_fps_calc_time_ = ros2_time::WallTime::now();
     if ( original_status_bar_ == statusBar() )
     {
       fps_label_->setText( QString::number(int(fps)) + QString(" fps") );
@@ -265,11 +273,12 @@ void VisualizationFrame::initialize(const QString& display_config_file )
   // See: http://doc.qt.io/qt-5/qsplashscreen.html#details
   if (app_) app_->processEvents();
 
-  if( !ros::isInitialized() )
-  {
-    int argc = 0;
-    ros::init( argc, 0, "rviz", ros::init_options::AnonymousName );
-  }
+  // TODO: no way to check if initialized...
+  //if( !ros::isInitialized() )
+  //{
+  //  int argc = 0;
+  //  ros::init( argc, 0, "rviz", ros::init_options::AnonymousName );
+  //}
 
   // Periodically process events for the splash screen.
   if (app_) app_->processEvents();

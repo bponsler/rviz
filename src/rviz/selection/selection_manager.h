@@ -50,13 +50,11 @@
 #include <OgreSharedPtr.h>
 #endif
 
+#include <rclcpp/publisher.hpp>
+#include <sensor_msgs/msg/image.hpp>
+
 #include <vector>
 #include <set>
-
-namespace ros
-{
-class Publisher;
-}
 
 namespace Ogre
 {
@@ -284,7 +282,8 @@ private:
 
   PropertyTreeModel* property_model_;
 
-  typedef std::map<std::string, ros::Publisher> PublisherMap;
+  typedef rclcpp::publisher::Publisher<sensor_msgs::msg::Image>::SharedPtr ImagePub;
+  typedef std::map<std::string, ImagePub> PublisherMap;
   PublisherMap debug_publishers_;
 };
 

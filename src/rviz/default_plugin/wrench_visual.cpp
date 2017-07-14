@@ -48,7 +48,7 @@ WrenchVisual::~WrenchVisual()
 }
 
 
-void WrenchVisual::setWrench( const geometry_msgs::Wrench& wrench )
+void WrenchVisual::setWrench( const geometry_msgs::msg::Wrench& wrench )
 {
     Ogre::Vector3 force(wrench.force.x, wrench.force.y, wrench.force.z);
     Ogre::Vector3 torque(wrench.torque.x, wrench.torque.y, wrench.torque.z);

@@ -65,12 +65,12 @@ void PoseArrayDisplay::onInitialize()
   scene_node_->attachObject( manual_object_ );
 }
 
-bool validateFloats( const geometry_msgs::PoseArray& msg )
+bool validateFloats( const geometry_msgs::msg::PoseArray& msg )
 {
   return validateFloats( msg.poses );
 }
 
-void PoseArrayDisplay::processMessage( const geometry_msgs::PoseArray::ConstPtr& msg )
+void PoseArrayDisplay::processMessage( const geometry_msgs::msg::PoseArray::SharedPtr msg )
 {
   if( !validateFloats( *msg ))
   {

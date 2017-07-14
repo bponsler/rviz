@@ -27,9 +27,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <tf/transform_listener.h>
+//#include <tf/transform_listener.h> // TODO: need this header
 
-#include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/msg/pose_stamped.hpp>
 
 #include "rviz/display_context.h"
 #include "rviz/properties/string_property.h"
@@ -57,17 +57,17 @@ void GoalTool::onInitialize()
 
 void GoalTool::updateTopic()
 {
-  pub_ = nh_.advertise<geometry_msgs::PoseStamped>( topic_property_->getStdString(), 1 );
+  pub_ = nh_.advertise<geometry_msgs::msg::PoseStamped>( topic_property_->getStdString(), 1 );
 }
 
 void GoalTool::onPoseSet(double x, double y, double theta)
 {
   std::string fixed_frame = context_->getFixedFrame().toStdString();
-  tf::Quaternion quat;
+  tf2::Quaternion quat;
   quat.setRPY(0.0, 0.0, theta);
-  tf::Stamped<tf::Pose> p = tf::Stamped<tf::Pose>(tf::Pose(quat, tf::Point(x, y, 0.0)), ros::Time::now(), fixed_frame);
-  geometry_msgs::PoseStamped goal;
-  tf::poseStampedTFToMsg(p, goal);
+  tf2::Stamped<tf::Pose> p = tf::Stamped<tf::Pose>(tf::Pose(quat, tf::Point(x, y, 0.0)), ros::Time::now(), fixed_frame);
+  geometry_msgs::msg::PoseStamped goal;
+  tf2::poseStampedTFToMsg(p, goal);
   ROS_INFO("Setting goal: Frame:%s, Position(%.3f, %.3f, %.3f), Orientation(%.3f, %.3f, %.3f, %.3f) = Angle: %.3f\n", fixed_frame.c_str(),
       goal.pose.position.x, goal.pose.position.y, goal.pose.position.z,
       goal.pose.orientation.x, goal.pose.orientation.y, goal.pose.orientation.z, goal.pose.orientation.w, theta);

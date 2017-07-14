@@ -83,11 +83,11 @@ void LineStripMarker::onNewMessage(const MarkerConstPtr& old_message, const Mark
   bool has_per_point_color = new_message->colors.size() == new_message->points.size();
 
   size_t i = 0;
-  std::vector<geometry_msgs::Point>::const_iterator it = new_message->points.begin();
-  std::vector<geometry_msgs::Point>::const_iterator end = new_message->points.end();
+  std::vector<geometry_msgs::msg::Point>::const_iterator it = new_message->points.begin();
+  std::vector<geometry_msgs::msg::Point>::const_iterator end = new_message->points.end();
   for ( ; it != end; ++it, ++i )
   {
-    const geometry_msgs::Point& p = *it;
+    const geometry_msgs::msg::Point& p = *it;
 
     Ogre::Vector3 v( p.x, p.y, p.z );
 

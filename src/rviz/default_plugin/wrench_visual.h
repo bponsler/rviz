@@ -1,7 +1,7 @@
 #ifndef WRENCHSTAMPED_VISUAL_H
 #define WRENCHSTAMPED_VISUAL_H
 
-#include <geometry_msgs/Wrench.h>
+#include <geometry_msgs/msg/wrench.hpp>
 
 namespace Ogre
 {
@@ -36,7 +36,7 @@ public:
     // Configure the visual to show the given force and torque vectors
     void setWrench( const Ogre::Vector3 &force, const Ogre::Vector3 &torque );
     // Configure the visual to show the data in the message.
-    void setWrench( const geometry_msgs::Wrench& wrench );
+    void setWrench( const geometry_msgs::msg::Wrench& wrench );
 
     // Set the pose of the coordinate frame the message refers to.
     // These could be done inside setMessage(), but that would require

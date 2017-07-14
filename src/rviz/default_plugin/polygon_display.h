@@ -31,7 +31,7 @@
 #ifndef RVIZ_POLYGON_DISPLAY_H
 #define RVIZ_POLYGON_DISPLAY_H
 
-#include <geometry_msgs/PolygonStamped.h>
+#include <geometry_msgs/msg/polygon_stamped.hpp>
 
 #include "rviz/message_filter_display.h"
 
@@ -48,9 +48,9 @@ class FloatProperty;
 
 /**
  * \class PolygonDisplay
- * \brief Displays a geometry_msgs::PolygonStamped message
+ * \brief Displays a geometry_msgs::msg::PolygonStamped message
  */
-class PolygonDisplay: public MessageFilterDisplay<geometry_msgs::PolygonStamped>
+class PolygonDisplay: public MessageFilterDisplay<geometry_msgs::msg::PolygonStamped>
 {
 Q_OBJECT
 public:
@@ -65,7 +65,7 @@ public:
 
 protected:
   /** @brief Overridden from MessageFilterDisplay. */
-  virtual void processMessage( const geometry_msgs::PolygonStamped::ConstPtr& msg );
+  virtual void processMessage( const geometry_msgs::msg::PolygonStamped::SharedPtr msg );
 
   Ogre::ManualObject* manual_object_;
 
