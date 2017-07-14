@@ -31,7 +31,6 @@
 
 #include <boost/filesystem.hpp>
 
-#include <rospack/rospack.h>
 #include <rclcpp/rclcpp.hpp>
 
 #include <QGroupBox>
@@ -54,14 +53,43 @@
 namespace rviz
 {
 
+// TODO: Until there's a C++ library for this
+struct TopicInfo {
+  std::string name;
+  std::string datatype;
+};
+typedef std::vector<TopicInfo> V_TopicInfo;
+
+void getTopics( V_TopicInfo & topics )
+{
+  TopicInfo topic;
+  topic.name = "/tf";
+  topic.datatype = "tf2_msgs/TFMessage";
+  topics.push_back(topic);
+
+  topic.name = "/tf_static";
+  topic.datatype = "tf2_msgs/TFMessage";
+  topics.push_back(topic);
+
+  topic.name = "/map";
+  topic.datatype = "nav_msgs/OccupancyGrid";
+  topics.push_back(topic);
+
+  topic.name = "/scan";
+  topic.datatype = "sensor_msgs/LaserScan";
+  topics.push_back(topic);
+  
+  // TODO: add various useful datatypes for testing purposes 
+}
+  
 // Utilities for grouping topics together
 
 struct LexicalTopicInfo {
-  bool operator()(const ros::master::TopicInfo &a, const ros::master::TopicInfo &b) {
+  bool operator()(const TopicInfo &a, const TopicInfo &b) {
     return a.name < b.name;
   }
 };
-
+  
 /**
  * Return true if one topic is a subtopic of the other.
  *
@@ -78,6 +106,7 @@ struct LexicalTopicInfo {
  */
 bool isSubtopic( const std::string &base, const std::string &topic )
 {
+  /* // TODO: implement ros::names functions
   std::string error;
   if ( !ros::names::validate(base, error) )
   {
@@ -99,6 +128,7 @@ bool isSubtopic( const std::string &base, const std::string &topic )
     }
     query = ros::names::parentNamespace( query );
   }
+  */
   return false;
 }
 
@@ -115,12 +145,13 @@ struct PluginGroup {
 
 void getPluginGroups( const QMap<QString, QString> &datatype_plugins,
                       QList<PluginGroup> *groups,
-                      QList<ros::master::TopicInfo> *unvisualizable )
+                      QList<TopicInfo> *unvisualizable )
 {
-  ros::master::V_TopicInfo all_topics;
-  ros::master::getTopics( all_topics );
+  // TODO: need a way to get list of active ROS topics
+  V_TopicInfo all_topics;
+  getTopics( all_topics );
+  V_TopicInfo::iterator topic_it;
   std::sort( all_topics.begin(), all_topics.end(), LexicalTopicInfo() );
-  ros::master::V_TopicInfo::iterator topic_it;
 
   for ( topic_it = all_topics.begin(); topic_it != all_topics.end(); ++topic_it )
   {
@@ -515,7 +546,7 @@ void TopicDisplayWidget::fill( DisplayFactory *factory )
   findPlugins( factory );
 
   QList<PluginGroup> groups;
-  QList<ros::master::TopicInfo> unvisualizable;
+  QList<TopicInfo> unvisualizable;
   getPluginGroups( datatype_plugins_, &groups, &unvisualizable );
 
   // Insert visualizable topics along with their plugins
@@ -558,7 +589,7 @@ void TopicDisplayWidget::fill( DisplayFactory *factory )
   // Insert unvisualizable topics
   for ( int i = 0; i < unvisualizable.size(); ++i )
   {
-    const ros::master::TopicInfo &ti = unvisualizable.at( i );
+    const TopicInfo &ti = unvisualizable.at( i );
     QTreeWidgetItem *item = insertItem( QString::fromStdString( ti.name ),
                                         true );
   }

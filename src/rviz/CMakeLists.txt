@@ -44,7 +44,7 @@ add_library( ${PROJECT_NAME}
   #message_filter_display.h
   #mesh_loader.cpp
   new_object_dialog.cpp
-  #add_display_dialog.cpp
+  add_display_dialog.cpp
   ogre_helpers/apply_visibility_bits.cpp
   ogre_helpers/arrow.cpp
   ogre_helpers/axes.cpp
