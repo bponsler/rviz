@@ -63,7 +63,7 @@ Display::Display()
   , associated_widget_panel_( NULL )
 {
   // Needed for timeSignal (see header) to work across threads
-  qRegisterMetaType<ros2_time::Time>();
+  qRegisterMetaType<tf2::TimePoint>();
 
   // Make the display-enable checkbox show up, and make it unchecked by default.
   setValue( false );
@@ -293,7 +293,7 @@ void Display::setFixedFrame( const QString& fixed_frame )
   }
 }
 
-void Display::emitTimeSignal( ros2_time::Time time )
+void Display::emitTimeSignal( tf2::TimePoint time )
 {
   Q_EMIT( timeSignal( this, time ) );
 }

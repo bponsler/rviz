@@ -31,7 +31,7 @@
 
 #include <string>
 
-#include <ros2_time/time.hpp>
+#include <tf2/time.h>
 
 #ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
 # include <rclcpp/rclcpp.hpp>
@@ -53,7 +53,7 @@ class SceneNode;
 }
 
 // needed for timeSignal
-Q_DECLARE_METATYPE(ros2_time::Time);
+Q_DECLARE_METATYPE(tf2::TimePoint);
 
 namespace rviz
 {
@@ -194,11 +194,11 @@ public:
   void setName( const QString& name );
 
   /** @brief Emit a time signal that other Displays can synchronize to. */
-  void emitTimeSignal( ros2_time::Time time );
+  void emitTimeSignal( tf2::TimePoint time );
 
 Q_SIGNALS:
 
-  void timeSignal( rviz::Display* display, ros2_time::Time time );
+  void timeSignal( rviz::Display* display, tf2::TimePoint time );
 
 public Q_SLOTS:
   /** @brief Enable or disable this Display.

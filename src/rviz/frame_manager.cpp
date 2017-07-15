@@ -284,8 +284,8 @@ bool FrameManager::transform(const std::string& frame, tf2::TimePoint time, cons
   }
   catch(std::runtime_error& e)
   {
-    ROS_DEBUG("Error transforming from frame '%s' to frame '%s': %s", frame.c_str(), fixed_frame_.c_str(), e.what());
-    return false;
+    // Use a default transform
+    pose_out = tf2::Transform(tf2::Quaternion( 0, 0, 0, 1), tf2::Vector3( 0, 0, 0));
   }
 
   bt_position = pose_out.getOrigin();
