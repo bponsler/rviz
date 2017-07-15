@@ -233,7 +233,7 @@ void VisualizationManager::initialize()
   selection_manager_->initialize();
   tool_manager_->initialize();
 
-  last_update_ros_time_ = ros2_time::Time::now();
+  last_update_ros_time_ = tf2::get_now();
   last_update_wall_time_ = ros2_time::WallTime::now();
 }
 
@@ -305,10 +305,10 @@ void VisualizationManager::queueRender()
 void VisualizationManager::onUpdate()
 {
   ros2_time::WallDuration wall_diff = ros2_time::WallTime::now() - last_update_wall_time_;
-  ros2_time::Duration ros_diff = ros2_time::Time::now() - last_update_ros_time_;
+  tf2::Duration ros_diff = tf2::get_now() - last_update_ros_time_;
   float wall_dt = wall_diff.toSec();
-  float ros_dt = ros_diff.toSec();
-  last_update_ros_time_ = ros2_time::Time::now();
+  float ros_dt = tf2::durationToSec(ros_diff);
+  last_update_ros_time_ = tf2::get_now();
   last_update_wall_time_ = ros2_time::WallTime::now();
 
   if(ros_dt < 0.0)
@@ -370,12 +370,12 @@ void VisualizationManager::onUpdate()
 
 void VisualizationManager::updateTime()
 {
-  if( ros_time_begin_.isZero() )
+  if( ros_time_begin_ == tf2::TimePointZero )
   {
-    ros_time_begin_ = ros2_time::Time::now();
+    ros_time_begin_ = tf2::get_now();
   }
 
-  ros_time_elapsed_ = ros2_time::Time::now() - ros_time_begin_;
+  ros_time_elapsed_ = tf2::get_now() - ros_time_begin_;
 
   if( wall_clock_begin_.isZero() )
   {
@@ -389,12 +389,11 @@ void VisualizationManager::updateFrames()
 {
   typedef std::vector<std::string> V_string;
   V_string frames;
-  // TODO: get frame strings from tf
-  //frame_manager_->getTFClient()->getFrameStrings( frames );
+  frame_manager_->getTFBuffer()->_getFrameStrings( frames );
 
   // Check the fixed frame to see if it's ok
   std::string error;
-  if( frame_manager_->frameHasProblems( getFixedFrame().toStdString(), ros2_time::Time(), error ))
+  if( frame_manager_->frameHasProblems( getFixedFrame().toStdString(), tf2::TimePointZero, error ))
   {
     if( frames.empty() )
     {
@@ -421,12 +420,17 @@ tf2_ros::TransformListener* VisualizationManager::getTFClient() const
   return frame_manager_->getTFClient();
 }
 
+tf2_ros::Buffer* VisualizationManager::getTFBuffer() const
+{
+  return frame_manager_->getTFBuffer();
+}
+
 void VisualizationManager::resetTime()
 {
   root_display_group_->reset();
   //frame_manager_->getTFClient()->clear();  // TODO: clear tf
 
-  ros_time_begin_ = ros2_time::Time();
+  ros_time_begin_ = tf2::TimePointZero;
   wall_clock_begin_ = ros2_time::WallTime();
 
   queueRender();
@@ -491,7 +495,7 @@ double VisualizationManager::getWallClock()
 
 double VisualizationManager::getROSTime()
 {
-  return frame_manager_->getTime().toSec();
+  return tf2::timeToSec(frame_manager_->getTime());
 }
 
 double VisualizationManager::getWallClockElapsed()
@@ -501,7 +505,7 @@ double VisualizationManager::getWallClockElapsed()
 
 double VisualizationManager::getROSTimeElapsed()
 {
-  return (frame_manager_->getTime() - ros_time_begin_).toSec();
+  return tf2::durationToSec(frame_manager_->getTime() - ros_time_begin_);
 }
 
 void VisualizationManager::updateBackgroundColor()

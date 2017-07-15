@@ -40,6 +40,8 @@
 
 #include "rviz/display.h"
 
+#include <tf2/time.h>
+
 namespace Ogre
 {
 class SceneNode;
@@ -157,8 +159,8 @@ public:
   float distance_to_parent_;
   Ogre::Quaternion arrow_orientation_;
 
-  ros::Time last_update_;
-  ros::Time last_time_to_fixed_;
+  tf2::TimePoint last_update_;
+  tf2::TimePoint last_time_to_fixed_;
 
   VectorProperty* rel_position_property_;
   QuaternionProperty* rel_orientation_property_;

@@ -31,7 +31,7 @@
 #define RVIZ_TIME_PANEL_H
 
 #include "rviz/panel.h"
-#include "ros2_time/time.hpp"
+#include "tf2/time.h"
 
 class QLineEdit;
 class QComboBox;
@@ -71,7 +71,7 @@ protected Q_SLOTS:
   void onDisplayAdded( rviz::Display* display );
   void onDisplayRemoved( rviz::Display* display );
 
-  void onTimeSignal( rviz::Display* display, ros2_time::Time time );
+  void onTimeSignal( rviz::Display* display, tf2::TimePoint time );
 
   virtual void load( const Config& config );
   virtual void save( Config config ) const;

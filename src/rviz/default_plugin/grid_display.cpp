@@ -132,7 +132,7 @@ void GridDisplay::update(float dt, float ros_dt)
 
   Ogre::Vector3 position;
   Ogre::Quaternion orientation;
-  if( context_->getFrameManager()->getTransform( frame, ros2_time::Time(), position, orientation ))
+  if( context_->getFrameManager()->getTransform( frame, tf2::TimePointZero, position, orientation ))
   {
     scene_node_->setPosition( position );
     scene_node_->setOrientation( orientation );
@@ -141,7 +141,7 @@ void GridDisplay::update(float dt, float ros_dt)
   else
   {
     std::string error;
-    if( context_->getFrameManager()->transformHasProblems( frame, ros2_time::Time(), error ))
+    if( context_->getFrameManager()->transformHasProblems( frame, tf2::TimePointZero, error ))
     {
       setStatus( StatusProperty::Error, "Transform", QString::fromStdString( error ));
     }

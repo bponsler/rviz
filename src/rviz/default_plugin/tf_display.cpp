@@ -30,7 +30,9 @@
 #include <OgreSceneNode.h>
 #include <OgreSceneManager.h>
 
-#include <tf/transform_listener.h>
+#include <ros2_console/assert.hpp>
+#include <ros2_console/console.hpp>
+#include <tf2_ros/transform_listener.h>
 
 #include "rviz/display_context.h"
 #include "rviz/frame_manager.h"
@@ -366,7 +368,7 @@ void TFDisplay::updateFrames()
 {
   typedef std::vector<std::string> V_string;
   V_string frames;
-  context_->getTFClient()->getFrameStrings( frames );
+  context_->getTFBuffer()->_getFrameStrings( frames );
   std::sort(frames.begin(), frames.end());
 
   S_FrameInfo current_frames;
@@ -429,7 +431,7 @@ FrameInfo* TFDisplay::createFrame(const std::string& frame)
   frames_.insert( std::make_pair( frame, info ) );
 
   info->name_ = frame;
-  info->last_update_ = ros::Time::now();
+  info->last_update_ = tf2::get_now();
   info->axes_ = new Axes( scene_manager_, axes_node_, 0.2, 0.02 );
   info->axes_->getSceneNode()->setVisible( show_axes_property_->getBool() );
   info->selection_handler_.reset( new FrameSelectionHandler( info, this, context_ ));
@@ -492,37 +494,40 @@ Ogre::ColourValue lerpColor(const Ogre::ColourValue& start, const Ogre::ColourVa
 
 void TFDisplay::updateFrame( FrameInfo* frame )
 {
-  tf::TransformListener* tf = context_->getTFClient();
+  tf2_ros::Buffer* buffer = context_->getTFBuffer();
 
+  tf2::CompactFrameID fixed_id = buffer->_lookupFrameNumber(fixed_frame_.toStdString());
+  tf2::CompactFrameID frame_id = buffer->_lookupFrameNumber(frame->name_);
+  
   // Check last received time so we can grey out/fade out frames that have stopped being published
-  ros::Time latest_time;
-  tf->getLatestCommonTime( fixed_frame_.toStdString(), frame->name_, latest_time, 0 );
+  tf2::TimePoint latest_time;
+  buffer->_getLatestCommonTime( fixed_id, frame_id, latest_time, 0 );
 
   if(( latest_time != frame->last_time_to_fixed_ ) ||
-     ( latest_time == ros::Time() ))
+     ( latest_time == tf2::TimePointZero ))
   {
-    frame->last_update_ = ros::Time::now();
+    frame->last_update_ = tf2::get_now();
     frame->last_time_to_fixed_ = latest_time;
   }
 
   // Fade from color -> grey, then grey -> fully transparent
-  ros::Duration age = ros::Time::now() - frame->last_update_;
+  tf2::Duration age = tf2::get_now() - frame->last_update_;
   float frame_timeout = frame_timeout_property_->getFloat();
   float one_third_timeout = frame_timeout * 0.3333333f;
-  if( age > ros::Duration( frame_timeout ))
+  if( age > tf2::durationFromSec( frame_timeout ))
   {
     frame->parent_arrow_->getSceneNode()->setVisible(false);
     frame->axes_->getSceneNode()->setVisible(false);
     frame->name_node_->setVisible(false);
     return;
   }
-  else if (age > ros::Duration(one_third_timeout))
+  else if (age > tf2::durationFromSec(one_third_timeout))
   {
     Ogre::ColourValue grey(0.7, 0.7, 0.7, 1.0);
 
-    if (age > ros::Duration(one_third_timeout * 2))
+    if (age > tf2::durationFromSec(one_third_timeout * 2))
     {
-      float a = std::max(0.0, (frame_timeout - age.toSec())/one_third_timeout);
+      float a = std::max(0.0, (frame_timeout - tf2::durationToSec(age))/one_third_timeout);
       Ogre::ColourValue c = Ogre::ColourValue(grey.r, grey.g, grey.b, a);
 
       frame->axes_->setXColor(c);
@@ -533,7 +538,7 @@ void TFDisplay::updateFrame( FrameInfo* frame )
     }
     else
     {
-      float t = std::max(0.0, (one_third_timeout * 2 - age.toSec())/one_third_timeout);
+      float t = std::max(0.0, (one_third_timeout * 2 - tf2::durationToSec(age))/one_third_timeout);
       frame->axes_->setXColor(lerpColor(frame->axes_->getDefaultXColor(), grey, t));
       frame->axes_->setYColor(lerpColor(frame->axes_->getDefaultYColor(), grey, t));
       frame->axes_->setZColor(lerpColor(frame->axes_->getDefaultZColor(), grey, t));
@@ -554,7 +559,7 @@ void TFDisplay::updateFrame( FrameInfo* frame )
 
   Ogre::Vector3 position;
   Ogre::Quaternion orientation;
-  if( !context_->getFrameManager()->getTransform( frame->name_, ros::Time(), position, orientation ))
+  if( !context_->getFrameManager()->getTransform( frame->name_, tf2::TimePointZero, position, orientation ))
   {
     std::stringstream ss;
     ss << "No transform from [" << frame->name_ << "] to frame [" << fixed_frame_.toStdString() << "]";
@@ -586,7 +591,7 @@ void TFDisplay::updateFrame( FrameInfo* frame )
 
   std::string old_parent = frame->parent_;
   frame->parent_.clear();
-  bool has_parent = tf->getParent( frame->name_, ros::Time(), frame->parent_ );
+  bool has_parent = buffer->_getParent( frame->name_, tf2::TimePointZero, frame->parent_ );
   if( has_parent )
   {
     // If this frame has no tree property or the parent has changed,
@@ -613,19 +618,23 @@ void TFDisplay::updateFrame( FrameInfo* frame )
       }
     }
 
-    tf::StampedTransform transform;
+    geometry_msgs::msg::TransformStamped transform;
     try {
-      context_->getFrameManager()->getTFClientPtr()->lookupTransform(frame->parent_,frame->name_,ros::Time(0),transform);
+      transform = context_->getFrameManager()->getTFBuffer()->lookupTransform(
+          frame->parent_,
+	  frame->name_,
+	  tf2::TimePointZero,
+	  tf2::durationFromSec(0.1));
     }
-    catch(tf::TransformException& e)
+    catch(tf2::TransformException& e)
     {
       ROS_DEBUG( "Error transforming frame '%s' (parent of '%s') to frame '%s'",
                  frame->parent_.c_str(), frame->name_.c_str(), qPrintable( fixed_frame_ ));
     }
 
     // get the position/orientation relative to the parent frame
-    Ogre::Vector3 relative_position( transform.getOrigin().x(), transform.getOrigin().y(), transform.getOrigin().z() );
-    Ogre::Quaternion relative_orientation( transform.getRotation().w(), transform.getRotation().x(), transform.getRotation().y(), transform.getRotation().z() );
+    Ogre::Vector3 relative_position( transform.transform.translation.x, transform.transform.translation.y, transform.transform.translation.z );
+    Ogre::Quaternion relative_orientation( transform.transform.rotation.w, transform.transform.rotation.x, transform.transform.rotation.y, transform.transform.rotation.z );
     frame->rel_position_property_->setVector( relative_position );
     frame->rel_orientation_property_->setQuaternion( relative_orientation );
 
@@ -633,7 +642,7 @@ void TFDisplay::updateFrame( FrameInfo* frame )
     {
       Ogre::Vector3 parent_position;
       Ogre::Quaternion parent_orientation;
-      if (!context_->getFrameManager()->getTransform(frame->parent_, ros::Time(), parent_position, parent_orientation))
+      if (!context_->getFrameManager()->getTransform(frame->parent_, tf2::TimePointZero, parent_position, parent_orientation))
       {
         ROS_DEBUG( "Error transforming frame '%s' (parent of '%s') to frame '%s'",
                    frame->parent_.c_str(), frame->name_.c_str(), qPrintable( fixed_frame_ ));

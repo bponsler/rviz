@@ -1,7 +1,7 @@
 #include <OgreSceneNode.h>
 #include <OgreSceneManager.h>
 
-#include <tf/transform_listener.h>
+#include <tf2_ros/transform_listener.h>
 
 #include <rviz/visualization_manager.h>
 #include <rviz/properties/color_property.h>
@@ -24,7 +24,7 @@ namespace rviz
         name_ = name;
         effort_ = 0;
         max_effort_ = 0;
-        last_update_ = ros::Time::now();
+        last_update_ = tf2::get_now();
 
         //info->category_ = new Property( QString::fromStdString( info->name_ ) , QVariant(), "", joints_category_);
         category_ = new rviz::Property( QString::fromStdString( name_ ) , true, "", parent_category, SLOT( updateVisibility() ), this);

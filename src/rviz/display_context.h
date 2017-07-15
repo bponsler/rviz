@@ -49,6 +49,7 @@ class CallbackQueueInterface;
 namespace tf2_ros
 {
 class TransformListener;
+class Buffer;
 }
 
 namespace rviz
@@ -91,6 +92,9 @@ public:
 
   /** @brief Convenience function: returns getFrameManager()->getTFClient(). */
   virtual tf2_ros::TransformListener* getTFClient() const = 0;
+
+  /** @brief Convenience function: returns getFrameManager()->getTFBuffer(). */
+  virtual tf2_ros::Buffer* getTFBuffer() const = 0;
 
   /** @brief Return the fixed frame name. */
   virtual QString getFixedFrame() const = 0;

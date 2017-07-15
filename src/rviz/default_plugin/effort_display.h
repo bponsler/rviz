@@ -5,7 +5,7 @@
 #include <boost/circular_buffer.hpp>
 #endif
 
-#include <sensor_msgs/JointState.h>
+#include <sensor_msgs/msg/joint_state.hpp>
 #include <rviz/message_filter_display.h>
 
 namespace Ogre
@@ -233,7 +233,7 @@ public:
 	    {
 		boost::shared_ptr<std::map<std::string, std::string> > header(new std::map<std::string, std::string>);
 		(*header)["callerid"] = "unknown";
-		add(MEvent(message, header, ros::Time::now()));
+		add(MEvent(message, header, tf2::get_now()));
 	    }
 
 	/**
@@ -284,7 +284,7 @@ public:
 		const MConstPtr& message = evt.getMessage();
 		std::string callerid = evt.getPublisherName();
 		std::string frame_id = ros::message_traits::FrameId<M>::value(*message);
-		ros::Time stamp = ros::message_traits::TimeStamp<M>::value(*message);
+		tf2::TimePoint stamp = ros::message_traits::TimeStamp<M>::value(*message);
 
 		// FIXED
 		if (frame_id.empty()) frame_id = * (target_frames_.begin());
@@ -318,9 +318,9 @@ public:
 		{
 		    const std::string& target_frame = *target_it;
 
-		    if (target_frame != frame_id && stamp != ros::Time(0))
+		    if (target_frame != frame_id && stamp != tf2::TimePointZero)
 		    {
-			ros::Time latest_transform_time ;
+			tf2::TimePoint latest_transform_time ;
 
 			tf_.getLatestCommonTime(frame_id, target_frame, latest_transform_time, 0) ;
 			if (stamp + tf_.getCacheLength() < latest_transform_time)
@@ -427,10 +427,10 @@ public:
 	    {
 		if (next_failure_warning_.isZero())
 		{
-		    next_failure_warning_ = ros::Time::now() + ros::Duration(15);
+		    next_failure_warning_ = tf2::get_now() + tf2::durationFromSec(15);
 		}
 
-		if (ros::Time::now() >= next_failure_warning_)
+		if (tf2::get_now() >= next_failure_warning_)
 		{
 		    if (incoming_message_count_ - message_count_ == 0)
 		    {
@@ -441,7 +441,7 @@ public:
 		    if (dropped_pct > 0.95)
 		    {
 			TF_MESSAGEFILTER_WARN("Dropped %.2f%% of messages so far. Please turn the [%s.message_notifier] rosconsole logger to DEBUG for more information.", dropped_pct*100, ROSCONSOLE_DEFAULT_NAME);
-			next_failure_warning_ = ros::Time::now() + ros::Duration(60);
+			next_failure_warning_ = tf2::get_now() + tf2::durationFromSec(60);
 
 			if ((double)failed_out_the_back_count_ / (double)dropped_message_count_ > 0.5)
 			{
@@ -489,10 +489,10 @@ public:
 	uint64_t incoming_message_count_;
 	uint64_t dropped_message_count_;
 
-	ros::Time last_out_the_back_stamp_;
+	tf2::TimePoint last_out_the_back_stamp_;
 	std::string last_out_the_back_frame_;
 
-	ros::Time next_failure_warning_;
+	tf2::TimePoint next_failure_warning_;
 
 	ros::Duration time_tolerance_; ///< Provide additional tolerance on time for messages which are stamped but can have associated duration
 
@@ -655,7 +655,7 @@ namespace rviz
         double getMaxEffort();
         bool getEnabled() const;
 
-        ros::Time last_update_;
+        tf2::TimePoint last_update_;
 
     public Q_SLOTS:
         void updateVisibility();

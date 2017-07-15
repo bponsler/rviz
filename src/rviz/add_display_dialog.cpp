@@ -61,25 +61,8 @@ struct TopicInfo {
 typedef std::vector<TopicInfo> V_TopicInfo;
 
 void getTopics( V_TopicInfo & topics )
-{
-  TopicInfo topic;
-  topic.name = "/tf";
-  topic.datatype = "tf2_msgs/TFMessage";
-  topics.push_back(topic);
-
-  topic.name = "/tf_static";
-  topic.datatype = "tf2_msgs/TFMessage";
-  topics.push_back(topic);
-
-  topic.name = "/map";
-  topic.datatype = "nav_msgs/OccupancyGrid";
-  topics.push_back(topic);
-
-  topic.name = "/scan";
-  topic.datatype = "sensor_msgs/LaserScan";
-  topics.push_back(topic);
-  
-  // TODO: add various useful datatypes for testing purposes 
+{ 
+  // TODO: need a way to get a list of ROS 2 topics and datatypes
 }
   
 // Utilities for grouping topics together

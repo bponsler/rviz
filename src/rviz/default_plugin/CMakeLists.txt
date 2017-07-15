@@ -1,7 +1,7 @@
 include_directories(.)
 
 set(SOURCE_FILES
-  # axes_display.cpp
+  axes_display.cpp
   # camera_display.cpp
   # depth_cloud_display.cpp
   # depth_cloud_mld.cpp
@@ -46,7 +46,7 @@ set(SOURCE_FILES
   # relative_humidity_display.cpp
   # robot_model_display.cpp
   # temperature_display.cpp
-  # tf_display.cpp
+  tf_display.cpp
   tools/focus_tool.cpp
   tools/measure_tool.cpp
   tools/move_tool.cpp
