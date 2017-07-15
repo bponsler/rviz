@@ -39,11 +39,11 @@
 #include <OgreSharedPtr.h>
 #endif
 
-#include <nav_msgs/MapMetaData.h>
-#include <ros/time.h>
+#include <nav_msgs/msg/map_meta_data.hpp>
+#include <tf2/time.h>
 
-#include <nav_msgs/OccupancyGrid.h>
-#include <map_msgs/OccupancyGridUpdate.h>
+#include <nav_msgs/msg/occupancy_grid.hpp>
+#include <map_msgs/msg/occupancy_grid_update.hpp>
 
 #include "rviz/display.h"
 
@@ -107,10 +107,10 @@ protected:
   virtual void update( float wall_dt, float ros_dt );
 
   /** @brief Copy msg into current_map_ and call showMap(). */ 
-  void incomingMap(const nav_msgs::OccupancyGrid::ConstPtr& msg);
+  void incomingMap(const nav_msgs::msg::OccupancyGrid::SharedPtr msg);
 
   /** @brief Copy update's data into current_map_ and call showMap(). */ 
-  void incomingUpdate(const map_msgs::OccupancyGridUpdate::ConstPtr& update);
+  void incomingUpdate(const map_msgs::msg::OccupancyGridUpdate::SharedPtr update);
 
   void clear();
 
@@ -128,10 +128,10 @@ protected:
   int width_;
   int height_;
   std::string frame_;
-  nav_msgs::OccupancyGrid current_map_;
+  nav_msgs::msg::OccupancyGrid current_map_;
 
-  ros::Subscriber map_sub_;
-  ros::Subscriber update_sub_;
+  rclcpp::subscription::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr map_sub_;
+  rclcpp::subscription::Subscription<map_msgs::msg::OccupancyGridUpdate>::SharedPtr update_sub_;
 
   RosTopicProperty* topic_property_;
   FloatProperty* resolution_property_;

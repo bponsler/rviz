@@ -35,9 +35,11 @@
 #include <OgreTechnique.h>
 #include <OgreSharedPtr.h>
 
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 
-#include <tf/transform_listener.h>
+#include <ros2_console/console.hpp>
+
+#include <tf2_ros/transform_listener.h>
 
 #include "rviz/frame_manager.h"
 #include "rviz/ogre_helpers/custom_parameter_indices.h"
@@ -67,7 +69,7 @@ MapDisplay::MapDisplay()
 {
   connect(this, SIGNAL( mapUpdated() ), this, SLOT( showMap() ));
   topic_property_ = new RosTopicProperty( "Topic", "",
-                                          QString::fromStdString( ros::message_traits::datatype<nav_msgs::OccupancyGrid>() ),
+                                          QString::fromStdString("nav_msgs/OccupancyGrid"),
                                           "nav_msgs::OccupancyGrid topic to subscribe to.",
                                           this, SLOT( updateTopic() ));
 
@@ -348,23 +350,23 @@ void MapDisplay::subscribe()
     {
       if(unreliable_property_->getBool())
       {
-        map_sub_ = update_nh_.subscribe( topic_property_->getTopicStd(), 1, &MapDisplay::incomingMap, this,  ros::TransportHints().unreliable());
+        map_sub_ = update_nh_->create_subscription<nav_msgs::msg::OccupancyGrid>( topic_property_->getTopicStd(), 1, std::bind(&MapDisplay::incomingMap, this, std::placeholders::_1)); // TODO:  ros::TransportHints().unreliable());
       }else{
-        map_sub_ = update_nh_.subscribe( topic_property_->getTopicStd(), 1, &MapDisplay::incomingMap, this, ros::TransportHints().reliable() );
+        map_sub_ = update_nh_->create_subscription<nav_msgs::msg::OccupancyGrid>( topic_property_->getTopicStd(), 1, std::bind(&MapDisplay::incomingMap, this, std::placeholders::_1)); // TODO: ros::TransportHints().reliable() );
       }
       setStatus( StatusProperty::Ok, "Topic", "OK" );
     }
-    catch( ros::Exception& e )
+    catch( rclcpp::exceptions::RCLError& e )
     {
       setStatus( StatusProperty::Error, "Topic", QString( "Error subscribing: " ) + e.what() );
     }
 
     try
     {
-      update_sub_ = update_nh_.subscribe( topic_property_->getTopicStd() + "_updates", 1, &MapDisplay::incomingUpdate, this );
+      update_sub_ = update_nh_->create_subscription<map_msgs::msg::OccupancyGridUpdate>( topic_property_->getTopicStd() + "_updates", 1, std::bind(&MapDisplay::incomingUpdate, this, std::placeholders::_1) );
       setStatus( StatusProperty::Ok, "Update Topic", "OK" );
     }
-    catch( ros::Exception& e )
+    catch( rclcpp::exceptions::RCLError& e )
     {
       setStatus( StatusProperty::Error, "Update Topic", QString( "Error subscribing: " ) + e.what() );
     }
@@ -373,8 +375,6 @@ void MapDisplay::subscribe()
 
 void MapDisplay::unsubscribe()
 {
-  map_sub_.shutdown();
-  update_sub_.shutdown();
 }
 
 // helper class to set alpha parameter on all renderables.
@@ -470,7 +470,7 @@ void MapDisplay::clear()
   loaded_ = false;
 }
 
-bool validateFloats(const nav_msgs::OccupancyGrid& msg)
+bool validateFloats(const nav_msgs::msg::OccupancyGrid& msg)
 {
   bool valid = true;
   valid = valid && validateFloats( msg.info.resolution );
@@ -478,7 +478,7 @@ bool validateFloats(const nav_msgs::OccupancyGrid& msg)
   return valid;
 }
 
-void MapDisplay::incomingMap(const nav_msgs::OccupancyGrid::ConstPtr& msg)
+void MapDisplay::incomingMap(const nav_msgs::msg::OccupancyGrid::SharedPtr msg)
 {
   current_map_ = *msg;
   // updated via signal in case ros spinner is in a different thread
@@ -487,7 +487,7 @@ void MapDisplay::incomingMap(const nav_msgs::OccupancyGrid::ConstPtr& msg)
 }
 
 
-void MapDisplay::incomingUpdate(const map_msgs::OccupancyGridUpdate::ConstPtr& update)
+void MapDisplay::incomingUpdate(const map_msgs::msg::OccupancyGridUpdate::SharedPtr update)
 {
   // Only update the map if we have gotten a full one first.
   if( !loaded_ )
@@ -702,7 +702,7 @@ void MapDisplay::transformMap()
 
   Ogre::Vector3 position;
   Ogre::Quaternion orientation;
-  if (!context_->getFrameManager()->transform(frame_, ros::Time(), current_map_.info.origin, position, orientation))
+  if (!context_->getFrameManager()->transform(frame_, tf2::TimePointZero, current_map_.info.origin, position, orientation))
   {
     ROS_DEBUG( "Error transforming map '%s' from frame '%s' to frame '%s'",
                qPrintable( getName() ), frame_.c_str(), qPrintable( fixed_frame_ ));
