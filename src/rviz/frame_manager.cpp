@@ -320,6 +320,11 @@ bool FrameManager::transformHasProblems(const std::string& frame, tf2::TimePoint
     return false;
   }
 
+  // Cannot transform to or from an invalid frame
+  if (fixed_frame_.size() == 0 || frame.size() == 0) {
+    return false;
+  }
+
   std::string tf_error;
   bool transform_succeeded = buffer_.canTransform(fixed_frame_, frame, time, &tf_error);
   if (transform_succeeded)
