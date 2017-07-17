@@ -257,15 +257,16 @@ protected:
   /** @brief The Ogre::SceneNode to hold all 3D scene elements shown by this Display. */
   Ogre::SceneNode* scene_node_;
 
-  /** @brief A NodeHandle whose CallbackQueue is run from the main GUI thread (the "update" thread).
+  /** @brief A NodeHandle whose CallbackQueue is run from different thread than the GUI thread.
    *
    * This is configured after the constructor and before onInitialize() is called. */
   rclcpp::node::Node::SharedPtr update_nh_;
 
-  /** @brief A NodeHandle whose CallbackQueue is run from a different thread than the GUI.
-   *
-   * This is configured after the constructor and before onInitialize() is called. */
-  rclcpp::node::Node::SharedPtr threaded_nh_;
+  /** Thread to spin the node handle. */
+  std::thread spin_thread_;
+
+  /** Threaded spinner. */
+  rclcpp::executors::multi_threaded_executor::MultiThreadedExecutor executor_;
 
   /** @brief A convenience variable equal to context_->getFixedFrame().
    *

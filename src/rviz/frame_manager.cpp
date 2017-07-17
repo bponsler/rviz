@@ -40,9 +40,10 @@
 namespace rviz
 {
 
-FrameManager::FrameManager(boost::shared_ptr<tf2_ros::TransformListener> tf)
+FrameManager::FrameManager(rclcpp::node::Node::SharedPtr nh, boost::shared_ptr<tf2_ros::TransformListener> tf)
   :
-  buffer_(tf2::Duration(10*60))
+  nh_(nh)
+, buffer_(tf2::durationFromSec(10*60))
 {
   if (!tf) {
     tf_.reset(new tf2_ros::TransformListener(

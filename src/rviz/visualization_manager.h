@@ -105,12 +105,13 @@ public:
   /**
    * \brief Constructor
    * Creates managers and sets up global properties.
+   * @param nh is the node handle
    * @param render_panel a pointer to the main render panel widget of the app.
    * @param wm a pointer to the window manager (which is really just a
    *        VisualizationFrame, the top-level container widget of rviz).
    * @param tf a pointer to tf2_ros::TransformListener which will be internally used by FrameManager.
    */
-  VisualizationManager( RenderPanel* render_panel, WindowManagerInterface* wm = 0, boost::shared_ptr<tf2_ros::TransformListener> tf = boost::shared_ptr<tf2_ros::TransformListener>() );
+   VisualizationManager( rclcpp::node::Node::SharedPtr nh, RenderPanel* render_panel, WindowManagerInterface* wm = 0, boost::shared_ptr<tf2_ros::TransformListener> tf = boost::shared_ptr<tf2_ros::TransformListener>() );
 
   /**
    * \brief Destructor

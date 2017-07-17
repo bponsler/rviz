@@ -30,7 +30,8 @@
 #ifndef RVIZ_LASER_SCAN_DISPLAY_H
 #define RVIZ_LASER_SCAN_DISPLAY_H
 
-#include <sensor_msgs/LaserScan.h>
+#include <sensor_msgs/msg/laser_scan.hpp>
+#include <tf2/time.h>
 
 #include "rviz/message_filter_display.h"
 
@@ -45,8 +46,8 @@ namespace rviz
 class IntProperty;
 class PointCloudCommon;
 
-/** @brief Visualizes a laser scan, received as a sensor_msgs::LaserScan. */
-class LaserScanDisplay: public MessageFilterDisplay<sensor_msgs::LaserScan>
+/** @brief Visualizes a laser scan, received as a sensor_msgs::msg::LaserScan. */
+class LaserScanDisplay: public MessageFilterDisplay<sensor_msgs::msg::LaserScan>
 {
 Q_OBJECT
 public:
@@ -65,14 +66,20 @@ protected:
   virtual void onInitialize();
 
   /** @brief Process a single message.  Overridden from MessageFilterDisplay. */
-  virtual void processMessage( const sensor_msgs::LaserScanConstPtr& scan );
+  virtual void processMessage( const sensor_msgs::msg::LaserScan::SharedPtr scan );
+
+  /** @brief Get the frame for the given message. */
+  virtual std::string getMsgFrame(const typename sensor_msgs::msg::LaserScan::SharedPtr msg);
+
+  /** @brief Get the time stamp for the given message. */
+  virtual tf2::TimePoint getMsgTime(const typename sensor_msgs::msg::LaserScan::SharedPtr msg);
 
   IntProperty* queue_size_property_;
 
   PointCloudCommon* point_cloud_common_;
 
   laser_geometry::LaserProjection* projector_;
-  ros::Duration filter_tolerance_;
+  tf2::Duration filter_tolerance_;
 };
 
 } // namespace rviz

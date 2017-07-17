@@ -33,9 +33,7 @@
 #include <OgreSceneNode.h>
 #include <OgreWireBoundingBox.h>
 
-#include <ros/time.h>
-
-#include <tf/transform_listener.h>
+#include <ros2_console/console.hpp>
 
 #include <pluginlib/class_loader.h>
 
@@ -128,7 +126,7 @@ void PointCloudSelectionHandler::postRenderPass(uint32_t pass)
   }
 }
 
-Ogre::Vector3 pointFromCloud(const sensor_msgs::PointCloud2ConstPtr& cloud, uint32_t index)
+Ogre::Vector3 pointFromCloud(const sensor_msgs::msg::PointCloud2::SharedPtr cloud, uint32_t index)
 {
   int32_t xi = findChannelIndex(cloud, "x");
   int32_t yi = findChannelIndex(cloud, "y");
@@ -165,7 +163,7 @@ void PointCloudSelectionHandler::createProperties( const Picked& obj, Property* 
     for (; it != end; ++it)
     {
       int index = *it;
-      const sensor_msgs::PointCloud2ConstPtr& message = cloud_info_->message_;
+      const sensor_msgs::msg::PointCloud2::SharedPtr message = cloud_info_->message_;
 
       IndexAndMessage hash_key( index, message.get() );
       if( !property_hash_.contains( hash_key ))
@@ -181,7 +179,7 @@ void PointCloudSelectionHandler::createProperties( const Picked& obj, Property* 
         // Then add all other fields as well.
         for( size_t field = 0; field < message->fields.size(); ++field )
         {
-          const sensor_msgs::PointField& f = message->fields[ field ];
+          const sensor_msgs::msg::PointField& f = message->fields[ field ];
           const std::string& name = f.name;
 
           if( name == "x" || name == "y" || name == "z" || name == "X" || name == "Y" || name == "Z" )
@@ -233,7 +231,7 @@ void PointCloudSelectionHandler::destroyProperties( const Picked& obj, Property*
     for (; it != end; ++it)
     {
       int index = *it;
-      const sensor_msgs::PointCloud2ConstPtr& message = cloud_info_->message_;
+      const sensor_msgs::msg::PointCloud2::SharedPtr message = cloud_info_->message_;
 
       IndexAndMessage hash_key( index, message.get() );
       
@@ -267,7 +265,7 @@ void PointCloudSelectionHandler::onSelect(const Picked& obj)
   {
     int index = (*it & 0xffffffff) - 1;
 
-    sensor_msgs::PointCloud2ConstPtr message = cloud_info_->message_;
+    sensor_msgs::msg::PointCloud2::SharedPtr message = cloud_info_->message_;
 
     Ogre::Vector3 pos = cloud_info_->transformed_points_[index].position;
     pos = cloud_info_->scene_node_->convertLocalToWorldPosition( pos );
@@ -312,8 +310,7 @@ void PointCloudCommon::CloudInfo::clear()
 }
 
 PointCloudCommon::PointCloudCommon( Display* display )
-: spinner_(1, &cbqueue_)
-, new_xyz_transformer_(false)
+: new_xyz_transformer_(false)
 , new_color_transformer_(false)
 , needs_retransform_(false)
 , transformer_class_loader_(NULL)
@@ -379,14 +376,10 @@ void PointCloudCommon::initialize( DisplayContext* context, Ogre::SceneNode* sce
   updateBillboardSize();
   updateAlpha();
   updateSelectable();
-
-  spinner_.start();
 }
 
 PointCloudCommon::~PointCloudCommon()
 {
-  spinner_.stop();
-
   if ( transformer_class_loader_ )
   {
     delete transformer_class_loader_;
@@ -534,7 +527,7 @@ void PointCloudCommon::update(float wall_dt, float ros_dt)
   // and put them into obsolete_cloud_infos, so active selections
   // are preserved
 
-  ros::Time now = ros::Time::now();
+  tf2::TimePoint now = tf2::get_now();
 
   // if decay time == 0, clear the old cloud when we get a new one
   // otherwise, clear all the outdated ones
@@ -542,7 +535,7 @@ void PointCloudCommon::update(float wall_dt, float ros_dt)
     boost::mutex::scoped_lock lock(new_clouds_mutex_);
     if ( point_decay_time > 0.0 || !new_cloud_infos_.empty() )
     {
-      while( !cloud_infos_.empty() && now.toSec() - cloud_infos_.front()->receive_time_.toSec() > point_decay_time )
+      while( !cloud_infos_.empty() && tf2::durationToSec(now - cloud_infos_.front()->receive_time_) > point_decay_time )
       {
         cloud_infos_.front()->clear();
         obsolete_cloud_infos_.push_back( cloud_infos_.front() );
@@ -583,7 +576,7 @@ void PointCloudCommon::update(float wall_dt, float ros_dt)
 
         V_CloudInfo::iterator next = it; next++;
         // ignore point clouds that are too old, but keep at least one
-        if ( next != end && now.toSec() - cloud_info->receive_time_.toSec() > point_decay_time ) {
+        if ( next != end && tf2::durationToSec(now - cloud_info->receive_time_) > point_decay_time ) {
           continue;
         }
 
@@ -646,7 +639,7 @@ void PointCloudCommon::setPropertiesHidden( const QList<Property*>& props, bool 
   }
 }
 
-void PointCloudCommon::updateTransformers( const sensor_msgs::PointCloud2ConstPtr& cloud )
+void PointCloudCommon::updateTransformers( const sensor_msgs::msg::PointCloud2::SharedPtr cloud )
 {
   std::string xyz_name = xyz_transformer_property_->getStdString();
   std::string color_name = color_transformer_property_->getStdString();
@@ -722,17 +715,21 @@ void PointCloudCommon::updateStatus()
   display_->setStatusStd(StatusProperty::Ok, "Points", ss.str());
 }
 
-void PointCloudCommon::processMessage(const sensor_msgs::PointCloud2ConstPtr& cloud)
+void PointCloudCommon::processMessage(const sensor_msgs::msg::PointCloud2::SharedPtr cloud)
 {
   CloudInfoPtr info(new CloudInfo);
   info->message_ = cloud;
-  info->receive_time_ = ros::Time::now();
+  info->receive_time_ = tf2::get_now();
 
   if (transformCloud(info, true))
   {
     boost::mutex::scoped_lock lock(new_clouds_mutex_);
     new_cloud_infos_.push_back(info);
-    display_->emitTimeSignal( cloud->header.stamp );
+
+    tf2::TimePoint tp(
+        std::chrono::seconds(cloud->header.stamp.sec) +
+	std::chrono::nanoseconds(cloud->header.stamp.nanosec));
+    display_->emitTimeSignal( tp );
   }
 }
 
@@ -758,7 +755,7 @@ void PointCloudCommon::updateColorTransformer()
   causeRetransform();
 }
 
-PointCloudTransformerPtr PointCloudCommon::getXYZTransformer( const sensor_msgs::PointCloud2ConstPtr& cloud )
+PointCloudTransformerPtr PointCloudCommon::getXYZTransformer( const sensor_msgs::msg::PointCloud2::SharedPtr cloud )
 {
   boost::recursive_mutex::scoped_lock lock( transformers_mutex_);
   M_TransformerInfo::iterator it = transformers_.find( xyz_transformer_property_->getStdString() );
@@ -774,7 +771,7 @@ PointCloudTransformerPtr PointCloudCommon::getXYZTransformer( const sensor_msgs:
   return PointCloudTransformerPtr();
 }
 
-PointCloudTransformerPtr PointCloudCommon::getColorTransformer( const sensor_msgs::PointCloud2ConstPtr& cloud )
+PointCloudTransformerPtr PointCloudCommon::getColorTransformer( const sensor_msgs::msg::PointCloud2::SharedPtr cloud )
 {
   boost::recursive_mutex::scoped_lock lock( transformers_mutex_ );
   M_TransformerInfo::iterator it = transformers_.find( color_transformer_property_->getStdString() );
@@ -874,7 +871,7 @@ bool PointCloudCommon::transformCloud(const CloudInfoPtr& cloud_info, bool updat
   return true;
 }
 
-bool convertPointCloudToPointCloud2(const sensor_msgs::PointCloud& input, sensor_msgs::PointCloud2& output)
+bool convertPointCloudToPointCloud2(const sensor_msgs::msg::PointCloud& input, sensor_msgs::msg::PointCloud2& output)
 {
   output.header = input.header;
   output.width  = input.points.size ();
@@ -887,7 +884,7 @@ bool convertPointCloudToPointCloud2(const sensor_msgs::PointCloud& input, sensor
   for (size_t d = 0; d < output.fields.size (); ++d, offset += 4)
   {
     output.fields[d].offset = offset;
-    output.fields[d].datatype = sensor_msgs::PointField::FLOAT32;
+    output.fields[d].datatype = sensor_msgs::msg::PointField::FLOAT32;
   }
   output.point_step = offset;
   output.row_step   = output.point_step * output.width;
@@ -915,14 +912,14 @@ bool convertPointCloudToPointCloud2(const sensor_msgs::PointCloud& input, sensor
   return (true);
 }
 
-void PointCloudCommon::addMessage(const sensor_msgs::PointCloudConstPtr& cloud)
+  void PointCloudCommon::addMessage(const sensor_msgs::msg::PointCloud::SharedPtr cloud)
 {
-  sensor_msgs::PointCloud2Ptr out(new sensor_msgs::PointCloud2);
+  sensor_msgs::msg::PointCloud2::SharedPtr out(new sensor_msgs::msg::PointCloud2);
   convertPointCloudToPointCloud2(*cloud, *out);
   addMessage(out);
 }
 
-void PointCloudCommon::addMessage(const sensor_msgs::PointCloud2ConstPtr& cloud)
+void PointCloudCommon::addMessage(const sensor_msgs::msg::PointCloud2::SharedPtr cloud)
 {
   processMessage(cloud);
 }
@@ -953,7 +950,7 @@ void PointCloudCommon::fillTransformerOptions( EnumProperty* prop, uint32_t mask
 
   boost::recursive_mutex::scoped_lock tlock(transformers_mutex_);
 
-  const sensor_msgs::PointCloud2ConstPtr& msg = cloud_infos_.front()->message_;
+  const sensor_msgs::msg::PointCloud2::SharedPtr msg = cloud_infos_.front()->message_;
 
   M_TransformerInfo::iterator it = transformers_.begin();
   M_TransformerInfo::iterator end = transformers_.end();

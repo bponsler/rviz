@@ -48,8 +48,6 @@
 #include <QToolButton>
 #include <QHBoxLayout>
 
-//#include <boost/algorithm/string/split.hpp>
-//#include <boost/algorithm/string/trim.hpp>
 #include <boost/filesystem.hpp>
 
 #include <ros2_console/console.hpp>
@@ -250,7 +248,7 @@ void VisualizationFrame::setSplashPath( const QString& splash_path )
   splash_path_ = splash_path;
 }
 
-void VisualizationFrame::initialize(const QString& display_config_file )
+void VisualizationFrame::initialize( rclcpp::node::Node::SharedPtr nh, const QString& display_config_file )
 {
   initConfigs();
 
@@ -333,7 +331,7 @@ void VisualizationFrame::initialize(const QString& display_config_file )
   // Periodically process events for the splash screen.
   if (app_) app_->processEvents();
 
-  manager_ = new VisualizationManager( render_panel_, this );
+  manager_ = new VisualizationManager( nh, render_panel_, this );
   manager_->setHelpPath( help_path_ );
 
   // Periodically process events for the splash screen.

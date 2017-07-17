@@ -28,7 +28,7 @@ find_package(std_msgs REQUIRED)
 find_package(std_srvs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
-#find_package(urdf REQUIRED)
+find_package(urdf REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(X11 REQUIRED)
@@ -173,7 +173,7 @@ set(INCLUDE_DIRS src ${ament_cmake_INCLUDE_DIRS} ${angles_INCLUDE_DIRS}
   ${resource_retriever_INCLUDE_DIRS}
   ${ros2_console_INCLUDE_DIRS} ${rclcpp_INCLUDE_DIRS}
   ${rclpy_INCLUDE_DIRS} ${sensor_msgs_INCLUDE_DIRS} ${sensor_msgs_util_INCLUDE_DIRS}
-  ${std_msgs_INCLUDE_DIRS} ${std_srvs_INCLUDE_DIRS} ${tf2_INCLUDE_DIRS} ${tf2_ros_INCLUDE_DIRS} #${urdf_INCLUDE_DIRS}
+  ${std_msgs_INCLUDE_DIRS} ${std_srvs_INCLUDE_DIRS} ${tf2_INCLUDE_DIRS} ${tf2_ros_INCLUDE_DIRS} ${urdf_INCLUDE_DIRS}
   ${visualization_msgs_INCLUDE_DIRS} ${pluginlib_INCLUDE_DIRS} ${OGRE_OV_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS} ${Qt5Gui_OPENGL_INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS}
   ${Qt5OpenGL_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIRS} ${X11_INCLUDE_DIRS}
@@ -189,7 +189,7 @@ set(LIBRARY_DIRS ${ament_cmake_LIBRARY_DIRS} ${angles_LIBRARY_DIRS}
   ${resource_retriever_LIBRARY_DIRS}
   ${ros2_console_LIBRARY_DIRS} ${rclcpp_LIBRARY_DIRS}
   ${rclpy_LIBRARY_DIRS} ${sensor_msgs_LIBRARY_DIRS} ${sensor_msgs_util_LIBRARY_DIRS} ${std_msgs_LIBRARY_DIRS}
-  ${std_srvs_LIBRARY_DIRS} ${tf2_LIBRARY_DIRS} ${tf2_ros_LIBRARY_DIRS} #${urdf_LIBRARY_DIRS}
+  ${std_srvs_LIBRARY_DIRS} ${tf2_LIBRARY_DIRS} ${tf2_ros_LIBRARY_DIRS} ${urdf_LIBRARY_DIRS}
   ${visualization_msgs_LIBRARY_DIRS} ${pluginlib_LIBRARY_DIRS} ${OGRE_OV_LIBRARY_DIRS}
   ${Boost_LIBRARY_DIRS} ${Qt5Gui_OPENGL_LIBRARY_DIRS} ${Qt5Widgets_LIBRARY_DIRS}
   ${Qt5OpenGL_LIBRARY_DIRS} ${EIGEN3_LIBRARY_DIRS} ${X11_LIBRARY_DIRS}
@@ -205,7 +205,7 @@ set(LIBS ${ament_cmake_LIBRARIES} ${angles_LIBRARIES} ${cmake_modules_LIBRARIES}
   ${resource_retriever_LIBRARIES} ${ros2_console_LIBRARIES}
   ${rclcpp_LIBRARIES} ${rclpy_LIBRARIES}
   ${sensor_msgs_LIBRARIES} ${sensor_msgs_util_LIBRARIES} ${std_msgs_LIBRARIES} ${std_srvs_LIBRARIES}
-  ${tf2_LIBRARIES} ${tf2_ros_LIBRARIES} #${urdf_LIBRARIES}
+  ${tf2_LIBRARIES} ${tf2_ros_LIBRARIES} ${urdf_LIBRARIES}
   ${visualization_msgs_LIBRARIES} ${pluginlib_LIBRARIES} ${OGRE_OV_LIBRARIES}
   ${Boost_LIBRARIES} ${Qt5Gui_OPENGL_LIBRARIES} ${Qt5Widgets_LIBRARIES}
   ${Qt5OpenGL_LIBRARIES} ${EIGEN3_LIBRARIES} ${X11_LIBRARIES}
@@ -255,7 +255,7 @@ ament_export_dependencies(std_msgs)
 ament_export_dependencies(std_srvs)
 ament_export_dependencies(tf2)
 ament_export_dependencies(tf2_ros)
-#ament_export_dependencies(urdf)
+ament_export_dependencies(urdf)
 ament_export_dependencies(visualization_msgs)
 ament_export_dependencies(pluginlib)
 ament_export_dependencies(X11)

@@ -40,6 +40,7 @@
 #include <OgreSceneNode.h>
 
 #include "rviz/display_context.h"
+#include "rviz/frame_manager.h"
 #include "rviz/ogre_helpers/apply_visibility_bits.h"
 #include "rviz/properties/property_tree_model.h"
 #include "rviz/properties/status_list.h"
@@ -79,6 +80,8 @@ Display::~Display()
   {
     scene_manager_->destroySceneNode( scene_node_ );
   }
+
+  spin_thread_.join();
 }
 
 void Display::initialize( DisplayContext* context )
@@ -87,9 +90,17 @@ void Display::initialize( DisplayContext* context )
   scene_manager_ = context_->getSceneManager();
   scene_node_ = scene_manager_->getRootSceneNode()->createChildSceneNode();
 
-  // TODO: need a way to do callback queus
-  //update_nh_.setCallbackQueue( context_->getUpdateQueue() );
-  //threaded_nh_.setCallbackQueue( context_->getThreadedQueue() );
+  // Create a new node for each display
+  update_nh_ = rclcpp::node::Node::make_shared("rviz_display");
+
+  // Spin nodes for each display
+  // TODO: this might be better to live in the visualization manager
+  //       and add nodes for each display, and remove accordingly
+  executor_.add_node(update_nh_);
+  spin_thread_ = std::thread(std::bind(
+      &rclcpp::executors::multi_threaded_executor::MultiThreadedExecutor::spin,
+      &executor_));
+
   fixed_frame_ = context_->getFixedFrame();
 
   onInitialize();

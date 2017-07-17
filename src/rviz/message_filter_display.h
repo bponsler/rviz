@@ -33,8 +33,7 @@
 #include <OgreSceneManager.h>
 #include <OgreSceneNode.h>
 
-#include <message_filters/subscriber.h>
-#include <tf2_ros/message_filter.h>
+#include <rclcpp/subscription.hpp>
 #endif
 
 #include "rviz/display_context.h"
@@ -87,35 +86,27 @@ public:
    * the long templated class name to refer to their super class. */
   typedef MessageFilterDisplay<MessageType> MFDClass;
 
-  MessageFilterDisplay()
-    : tf_filter_( NULL )
-    , messages_received_( 0 )
+  MessageFilterDisplay(const std::string& msgType)
+    : messages_received_( 0 )
     {
-      QString message_type = QString::fromStdString( ros::message_traits::datatype<MessageType>() );
+      // TODO: get message type from class?
+      QString message_type = QString::fromStdString( msgType );
       topic_property_->setMessageType( message_type );
       topic_property_->setDescription( message_type + " topic to subscribe to." );
     }
 
   virtual void onInitialize()
     {
-      tf_filter_ = new tf::MessageFilter<MessageType>( *context_->getTFClient(),
-                                                       fixed_frame_.toStdString(), 10, update_nh_ );
-
-      tf_filter_->connectInput( sub_ );
-      tf_filter_->registerCallback( std::bind( &MessageFilterDisplay<MessageType>::incomingMessage, this, std::placeholders::_1 ));
-      context_->getFrameManager()->registerFilterForTransformStatusCheck( tf_filter_, this );
     }
 
   virtual ~MessageFilterDisplay()
     {
       unsubscribe();
-      delete tf_filter_;
     }
 
   virtual void reset()
     {
       Display::reset();
-      tf_filter_->clear();
       messages_received_ = 0;
     }
 
@@ -140,18 +131,29 @@ protected:
         return;
       }
 
+      // Cannot subscribe to an empty topic
+      if (topic_property_->getTopicStd().size() == 0) {
+	return;
+      }
+
       try
       {
+	/* // TODO: support UDP vs TCP transport hints
         ros::TransportHints transport_hint = ros::TransportHints().reliable();
         // Determine UDP vs TCP transport for user selection.
         if (unreliable_property_->getBool())
         {
           transport_hint = ros::TransportHints().unreliable();
         }
-        sub_.subscribe( update_nh_, topic_property_->getTopicStd(), 10, transport_hint);
+	*/
+
+	sub_ = update_nh_->create_subscription<MessageType>(
+            topic_property_->getTopicStd(),
+	    10,
+            std::bind(&MessageFilterDisplay::incomingMessage, this, std::placeholders::_1));
         setStatus( StatusProperty::Ok, "Topic", "OK" );
       }
-      catch( ros::Exception& e )
+      catch( rclcpp::exceptions::RCLError& e )
       {
         setStatus( StatusProperty::Error, "Topic", QString( "Error subscribing: " ) + e.what() );
       }
@@ -159,7 +161,7 @@ protected:
 
   virtual void unsubscribe()
     {
-      sub_.unsubscribe();
+      sub_.reset();
     }
 
   virtual void onEnable()
@@ -175,18 +177,27 @@ protected:
 
   virtual void fixedFrameChanged()
     {
-      tf_filter_->setTargetFrame( fixed_frame_.toStdString() );
       reset();
     }
 
   /** @brief Incoming message callback.  Checks if the message pointer
    * is valid, increments messages_received_, then calls
    * processMessage(). */
-  void incomingMessage( const typename MessageType::ConstPtr& msg )
+  void incomingMessage( const typename MessageType::SharedPtr msg )
     {
       if( !msg )
       {
         return;
+      }
+
+      // Skip any messages that can not be transformed to the fixed frame
+      tf2_ros::Buffer* buffer = context_->getFrameManager()->getTFBuffer();
+      if (!buffer->canTransform(fixed_frame_.toStdString(),
+				getMsgFrame(msg),
+				getMsgTime(msg),
+				tf2::durationFromSec(0.1)))
+      {
+	return;
       }
 
       ++messages_received_;
@@ -198,10 +209,15 @@ protected:
   /** @brief Implement this to process the contents of a message.
    *
    * This is called by incomingMessage(). */
-  virtual void processMessage( const typename MessageType::ConstPtr& msg ) = 0;
+  virtual void processMessage( const typename MessageType::SharedPtr msg ) = 0;
 
-  message_filters::Subscriber<MessageType> sub_;
-  tf::MessageFilter<MessageType>* tf_filter_;
+  /** @brief Get the frame for the given message. */
+  virtual std::string getMsgFrame(const typename MessageType::SharedPtr msg) = 0;
+
+  /** @brief Get the time stamp for the given message. */
+  virtual tf2::TimePoint getMsgTime(const typename MessageType::SharedPtr msg) = 0;
+
+  typename rclcpp::subscription::Subscription<MessageType>::SharedPtr sub_;
   uint32_t messages_received_;
 };
 

@@ -46,6 +46,7 @@
 #include <ros2_console/console.hpp>
 #include <rclcpp/rclcpp.hpp>
 
+#include "rviz/frame_manager.h"
 #include "rviz/selection/selection_manager.h"
 #include "rviz/env_config.h"
 #include "rviz/ogre_helpers/ogre_logging.h"
@@ -285,7 +286,7 @@ bool VisualizerApp::init( int argc, char** argv )
     {
       frame_->setSplashPath( QString::fromStdString( splash_path ));
     }
-    frame_->initialize( QString::fromStdString( display_config ));
+    frame_->initialize( nh_, QString::fromStdString( display_config ));
     if( !fixed_frame.empty() )
     {
       frame_->getManager()->setFixedFrame( QString::fromStdString( fixed_frame ));

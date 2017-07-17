@@ -41,6 +41,7 @@
 #include "rviz/panel.h"
 
 #include <ros2_time/time.hpp>
+#include <rclcpp/node.hpp>
 
 class QSplashScreen;
 class QAction;
@@ -72,7 +73,7 @@ class VisualizationFrame : public QMainWindow, public WindowManagerInterface
 {
 Q_OBJECT
 public:
-  VisualizationFrame( QWidget* parent = 0 );
+   VisualizationFrame( QWidget* parent = 0 );
   ~VisualizationFrame();
 
   void setApp( QApplication * app );
@@ -99,7 +100,7 @@ public:
    * This function also calls VisualizationManager::initialize(),
    * which means it will start the update timer and generally get
    * things rolling. */
-  void initialize( const QString& display_config_file = "" );
+  void initialize( rclcpp::node::Node::SharedPtr nh, const QString& display_config_file = "" );
 
   VisualizationManager* getManager() { return manager_; }
 

@@ -108,13 +108,12 @@ class VisualizationManagerPrivate
 public:
   //ros::CallbackQueue threaded_queue_;
   boost::thread_group threaded_queue_threads_;
-  rclcpp::node::Node::SharedPtr update_nh_;
-  rclcpp::node::Node::SharedPtr threaded_nh_;
   boost::mutex render_mutex_;
 };
 
-VisualizationManager::VisualizationManager( RenderPanel* render_panel, WindowManagerInterface* wm, boost::shared_ptr<tf2_ros::TransformListener> tf )
-: ogre_root_( Ogre::Root::getSingletonPtr() )
+  VisualizationManager::VisualizationManager( rclcpp::node::Node::SharedPtr nh, RenderPanel* render_panel, WindowManagerInterface* wm, boost::shared_ptr<tf2_ros::TransformListener> tf )
+: nh_(nh)
+, ogre_root_( Ogre::Root::getSingletonPtr() )
 , update_timer_(0)
 , shutting_down_(false)
 , render_panel_( render_panel )
@@ -126,13 +125,9 @@ VisualizationManager::VisualizationManager( RenderPanel* render_panel, WindowMan
 , private_( new VisualizationManagerPrivate )
 , default_visibility_bit_( visibility_bit_allocator_.allocBit() )
 {
-  frame_manager_ = new FrameManager(tf);
+  frame_manager_ = new FrameManager(nh, tf);
 
-  nh_ = rclcpp::node::Node::make_shared("rviz_visualization_manager");
-  
   render_panel->setAutoRender(false);
-
-  //private_->threaded_nh_.setCallbackQueue(&private_->threaded_queue_); // TODO: fix this
 
   scene_manager_ = ogre_root_->createSceneManager( Ogre::ST_GENERIC );
 

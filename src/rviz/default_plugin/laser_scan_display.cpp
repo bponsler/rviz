@@ -30,7 +30,7 @@
 #include <OgreSceneNode.h>
 #include <OgreSceneManager.h>
 
-#include <ros/time.h>
+#include <ros2_console/console.hpp>
 
 #include <laser_geometry/laser_geometry.h>
 
@@ -47,7 +47,8 @@ namespace rviz
 {
 
 LaserScanDisplay::LaserScanDisplay()
-  : point_cloud_common_( new PointCloudCommon( this ))
+  : MessageFilterDisplay("sensor_msgs/LaserScan")
+  , point_cloud_common_( new PointCloudCommon( this ))
   , projector_( new laser_geometry::LaserProjection() )
 {
   queue_size_property_ = new IntProperty( "Queue Size", 10,
@@ -55,10 +56,6 @@ LaserScanDisplay::LaserScanDisplay()
                                           " Increasing this is useful if your incoming TF data is delayed significantly "
                                           "from your LaserScan data, but it can greatly increase memory usage if the messages are big.",
                                           this, SLOT( updateQueueSize() ));
-
-  // PointCloudCommon sets up a callback queue with a thread for each
-  // instance.  Use that for processing incoming messages.
-  update_nh_.setCallbackQueue( point_cloud_common_->getCallbackQueue() );
 }
 
 LaserScanDisplay::~LaserScanDisplay()
@@ -75,29 +72,31 @@ void LaserScanDisplay::onInitialize()
 
 void LaserScanDisplay::updateQueueSize()
 {
-  tf_filter_->setQueueSize( (uint32_t) queue_size_property_->getInt() );
+  // TODO: fix this?
+  //tf_filter_->setQueueSize( (uint32_t) queue_size_property_->getInt() );
 }
 
-void LaserScanDisplay::processMessage( const sensor_msgs::LaserScanConstPtr& scan )
+void LaserScanDisplay::processMessage( const sensor_msgs::msg::LaserScan::SharedPtr scan )
 {
-  sensor_msgs::PointCloudPtr cloud( new sensor_msgs::PointCloud );
+  sensor_msgs::msg::PointCloud::SharedPtr cloud( new sensor_msgs::msg::PointCloud );
 
   std::string frame_id = scan->header.frame_id;
 
   // Compute tolerance necessary for this scan
-  ros::Duration tolerance(scan->time_increment * scan->ranges.size());
+  tf2::Duration tolerance = tf2::durationFromSec(scan->time_increment * scan->ranges.size());
   if (tolerance > filter_tolerance_)
   {
     filter_tolerance_ = tolerance;
-    tf_filter_->setTolerance(filter_tolerance_);
+    // TODO: fix this
+    //tf_filter_->setTolerance(filter_tolerance_);
   }
 
   try
   {
-    projector_->transformLaserScanToPointCloud( fixed_frame_.toStdString(), *scan, *cloud, *context_->getTFClient(),
+    projector_->transformLaserScanToPointCloud( fixed_frame_.toStdString(), *scan, *cloud, *context_->getTFBuffer(),
                                                 laser_geometry::channel_option::Intensity );
   }
-  catch (tf::TransformException& e)
+  catch (tf2::TransformException& e)
   {
     ROS_DEBUG( "LaserScan [%s]: failed to transform scan: %s.  This message should not repeat (tolerance should now be set on our tf::MessageFilter).",
                qPrintable( getName() ), e.what() );
@@ -105,6 +104,19 @@ void LaserScanDisplay::processMessage( const sensor_msgs::LaserScanConstPtr& sca
   }
 
   point_cloud_common_->addMessage( cloud );
+}
+
+std::string LaserScanDisplay::getMsgFrame(const typename sensor_msgs::msg::LaserScan::SharedPtr msg)
+{
+  return msg->header.frame_id;
+}
+
+tf2::TimePoint LaserScanDisplay::getMsgTime(const typename sensor_msgs::msg::LaserScan::SharedPtr msg)
+{
+  tf2::TimePoint tp(
+      std::chrono::seconds(msg->header.stamp.sec) +
+      std::chrono::nanoseconds(msg->header.stamp.nanosec));
+  return tp;
 }
 
 void LaserScanDisplay::update( float wall_dt, float ros_dt )

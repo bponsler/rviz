@@ -46,6 +46,7 @@
 //#include <tf2_ros/message_filter.h>
 #include <tf2_ros/transform_listener.h>
 #include <tf2_ros/buffer.h>
+#include <rclcpp/node.hpp>
 #endif
 
 namespace tf
@@ -75,7 +76,7 @@ public:
   /** @brief Constructor
    * @param tf a pointer to tf2_ros::TransformListener (should not be used anywhere else because of thread safety)
    */
-  FrameManager(boost::shared_ptr<tf2_ros::TransformListener> tf = boost::shared_ptr<tf2_ros::TransformListener>());
+  FrameManager(rclcpp::node::Node::SharedPtr nh, boost::shared_ptr<tf2_ros::TransformListener> tf = boost::shared_ptr<tf2_ros::TransformListener>());
 
   /** @brief Destructor.
    *
@@ -106,6 +107,8 @@ public:
    /** @brief Get current time, depending on the sync mode. */
    tf2::TimePoint getTime() { return sync_time_; }
 
+   rclcpp::node::Node::SharedPtr getNodeHandle() const { return nh_; };
+
   /** @brief Return the pose for a header, relative to the fixed frame, in Ogre classes.
    * @param[in] header The source of the frame name and time.
    * @param[out] position The position of the header frame relative to the fixed frame.
@@ -114,7 +117,10 @@ public:
   template<typename Header>
   bool getTransform(const Header& header, Ogre::Vector3& position, Ogre::Quaternion& orientation)
   {
-    return getTransform(header.frame_id, header.stamp, position, orientation);
+    tf2::TimePoint tp(
+        std::chrono::seconds(header.stamp.sec) +
+	std::chrono::nanoseconds(header.stamp.nanosec));
+    return getTransform(header.frame_id, tp, position, orientation);
   }
 
   /** @brief Return the pose for a frame relative to the fixed frame, in Ogre classes, at a given time.
@@ -276,6 +282,8 @@ private:
 
   boost::mutex cache_mutex_;
   M_Cache cache_;
+
+  rclcpp::node::Node::SharedPtr nh_;
 
   tf2_ros::Buffer buffer_;
   boost::shared_ptr<tf2_ros::TransformListener> tf_;

@@ -16,8 +16,8 @@ set(SOURCE_FILES
   # interactive_markers/integer_action.cpp
   # interactive_markers/interactive_marker_control.cpp
   # interactive_markers/interactive_marker.cpp
-  # laser_scan_display.cpp
-  # map_display.cpp
+  laser_scan_display.cpp
+  map_display.cpp
   # marker_array_display.cpp
   # marker_display.cpp
   # markers/arrow_marker.cpp
@@ -35,10 +35,10 @@ set(SOURCE_FILES
   # point_display.cpp
   # point_visual.cpp
   # point_cloud2_display.cpp
-  # point_cloud_common.cpp
+  point_cloud_common.cpp
   # point_cloud_display.cpp
-  # point_cloud_transformer.h
-  # point_cloud_transformers.cpp
+  point_cloud_transformer.h
+  point_cloud_transformers.cpp
   # polygon_display.cpp
   # pose_array_display.cpp
   # pose_display.cpp

@@ -42,15 +42,10 @@
 # include <boost/thread/mutex.hpp>
 # include <boost/thread/recursive_mutex.hpp>
 
-# include <ros/spinner.h>
-# include <ros/callback_queue.h>
-
-# include <message_filters/time_sequencer.h>
-
 # include <pluginlib/class_loader.h>
 
-# include <sensor_msgs/PointCloud.h>
-# include <sensor_msgs/PointCloud2.h>
+# include <sensor_msgs/msg/point_cloud.hpp>
+# include <sensor_msgs/msg/point_cloud2.hpp>
 
 # include "rviz/selection/selection_manager.h"
 # include "rviz/default_plugin/point_cloud_transformer.h"
@@ -76,7 +71,7 @@ typedef std::vector<std::string> V_string;
 
 /**
  * \class PointCloudCommon
- * \brief Displays a point cloud of type sensor_msgs::PointCloud
+ * \brief Displays a point cloud of type sensor_msgs::msg::PointCloud
  *
  * By default it will assume channel 0 of the cloud is an intensity value, and will color them by intensity.
  * If you set the channel's name to "rgb", it will interpret the channel as an integer rgb value, with r, g and b
@@ -94,11 +89,11 @@ public:
     // clear the point cloud, but keep selection handler around
     void clear();
 
-    ros::Time receive_time_;
+    tf2::TimePoint receive_time_;
 
     Ogre::SceneManager *manager_;
 
-    sensor_msgs::PointCloud2ConstPtr message_;
+    sensor_msgs::msg::PointCloud2::SharedPtr message_;
 
     Ogre::SceneNode *scene_node_;
     boost::shared_ptr<PointCloud> cloud_;
@@ -125,10 +120,8 @@ public:
   void reset();
   void update(float wall_dt, float ros_dt);
 
-  void addMessage(const sensor_msgs::PointCloudConstPtr& cloud);
-  void addMessage(const sensor_msgs::PointCloud2ConstPtr& cloud);
-
-  ros::CallbackQueueInterface* getCallbackQueue() { return &cbqueue_; }
+  void addMessage(const sensor_msgs::msg::PointCloud::SharedPtr cloud);
+  void addMessage(const sensor_msgs::msg::PointCloud2::SharedPtr cloud);
 
   Display* getDisplay() { return display_; }
 
@@ -165,12 +158,12 @@ private:
    */
   bool transformCloud(const CloudInfoPtr& cloud, bool fully_update_transformers);
 
-  void processMessage(const sensor_msgs::PointCloud2ConstPtr& cloud);
+  void processMessage(const sensor_msgs::msg::PointCloud2::SharedPtr cloud);
   void updateStatus();
 
-  PointCloudTransformerPtr getXYZTransformer(const sensor_msgs::PointCloud2ConstPtr& cloud);
-  PointCloudTransformerPtr getColorTransformer(const sensor_msgs::PointCloud2ConstPtr& cloud);
-  void updateTransformers( const sensor_msgs::PointCloud2ConstPtr& cloud );
+  PointCloudTransformerPtr getXYZTransformer(const sensor_msgs::msg::PointCloud2::SharedPtr cloud);
+  PointCloudTransformerPtr getColorTransformer(const sensor_msgs::msg::PointCloud2::SharedPtr cloud);
+  void updateTransformers( const sensor_msgs::msg::PointCloud2::SharedPtr cloud );
   void retransform();
   void onTransformerOptions(V_string& ops, uint32_t mask);
 
@@ -179,9 +172,6 @@ private:
   float getSelectionBoxSize();
   void setPropertiesHidden( const QList<Property*>& props, bool hide );
   void fillTransformerOptions( EnumProperty* prop, uint32_t mask );
-
-  ros::AsyncSpinner spinner_;
-  ros::CallbackQueue cbqueue_;
 
   D_CloudInfo cloud_infos_;
 
