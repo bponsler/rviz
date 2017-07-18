@@ -187,13 +187,13 @@ void VisualizationFrame::setStatus( const QString & message )
 void VisualizationFrame::updateFps()
 {
   frame_count_ ++;
-  ros2_time::WallDuration wall_diff = ros2_time::WallTime::now() - last_fps_calc_time_;
+  tf2::Duration wall_diff = tf2::get_now() - last_fps_calc_time_;
 
-  if ( wall_diff.toSec() > 1.0 )
+  if ( tf2::durationToSec(wall_diff) > 1.0 )
   {
-    float fps = frame_count_ / wall_diff.toSec();
+    float fps = frame_count_ / tf2::durationToSec(wall_diff);
     frame_count_ = 0;
-    last_fps_calc_time_ = ros2_time::WallTime::now();
+    last_fps_calc_time_ = tf2::get_now();
     if ( original_status_bar_ == statusBar() )
     {
       fps_label_->setText( QString::number(int(fps)) + QString(" fps") );

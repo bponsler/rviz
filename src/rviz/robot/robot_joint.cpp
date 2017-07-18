@@ -46,7 +46,7 @@
 namespace rviz
 {
 
-RobotJoint::RobotJoint( Robot* robot, const boost::shared_ptr<const urdf::Joint>& joint )
+RobotJoint::RobotJoint( Robot* robot, const std::shared_ptr<const urdf::Joint>& joint )
   : robot_( robot )
   , name_( joint->name )
   , child_link_name_( joint->child_link_name )

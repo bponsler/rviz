@@ -33,7 +33,6 @@
 
 #include <deque>
 
-#include <ros2_time/time.hpp>
 #include <rclcpp/node.hpp>
 #include <tf2/time.h>
 
@@ -362,7 +361,7 @@ protected:
 
   QTimer* update_timer_;                                 ///< Update timer.  Display::update is called on each display whenever this timer fires
   tf2::TimePoint last_update_ros_time_;                        ///< Update stopwatch.  Stores how long it's been since the last update
-  ros2_time::WallTime last_update_wall_time_;
+  tf2::TimePoint last_update_wall_time_;
 
   volatile bool shutting_down_;
 
@@ -381,9 +380,9 @@ protected:
 
   RenderPanel* render_panel_;
 
-  ros2_time::WallTime wall_clock_begin_;
+  tf2::TimePoint wall_clock_begin_;
   tf2::TimePoint ros_time_begin_;
-  ros2_time::WallDuration wall_clock_elapsed_;
+  tf2::Duration wall_clock_elapsed_;
   tf2::Duration ros_time_elapsed_;
 
   ColorProperty* background_color_property_;

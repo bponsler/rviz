@@ -44,7 +44,7 @@ set(SOURCE_FILES
   # pose_display.cpp
   # range_display.cpp
   # relative_humidity_display.cpp
-  # robot_model_display.cpp
+  #robot_model_display.cpp
   # temperature_display.cpp
   tf_display.cpp
   tools/focus_tool.cpp

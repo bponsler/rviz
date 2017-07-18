@@ -89,7 +89,7 @@ class RobotJoint: public QObject
 {
 Q_OBJECT
 public:
-  RobotJoint( Robot* robot, const boost::shared_ptr<const urdf::Joint>& joint );
+  RobotJoint( Robot* robot, const std::shared_ptr<const urdf::Joint>& joint );
   virtual ~RobotJoint();
 
 

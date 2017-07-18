@@ -62,9 +62,9 @@ namespace urdf
 {
 class ModelInterface;
 class Link;
-typedef boost::shared_ptr<const Link> LinkConstPtr;
+typedef std::shared_ptr<const Link> LinkConstPtr;
 class Geometry;
-typedef boost::shared_ptr<const Geometry> GeometryConstPtr;
+typedef std::shared_ptr<const Geometry> GeometryConstPtr;
 class Pose;
 }
 
@@ -81,7 +81,7 @@ class Robot;
 class RobotLinkSelectionHandler;
 class VectorProperty;
 class RobotJoint;
-typedef boost::shared_ptr<RobotLinkSelectionHandler> RobotLinkSelectionHandlerPtr;
+typedef std::shared_ptr<RobotLinkSelectionHandler> RobotLinkSelectionHandlerPtr;
 
 
 /**

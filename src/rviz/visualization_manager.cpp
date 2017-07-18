@@ -49,7 +49,6 @@
 
 #include <tf2_ros/transform_listener.h>
 
-#include <ros2_time/time.hpp>
 #include <rospack/rospack.h>
 //#include <ros/callback_queue.h>
 
@@ -229,7 +228,7 @@ void VisualizationManager::initialize()
   tool_manager_->initialize();
 
   last_update_ros_time_ = tf2::get_now();
-  last_update_wall_time_ = ros2_time::WallTime::now();
+  last_update_wall_time_ = tf2::get_now();
 }
 
 /**  // TODO: get callback queue interface working
@@ -299,12 +298,12 @@ void VisualizationManager::queueRender()
 
 void VisualizationManager::onUpdate()
 {
-  ros2_time::WallDuration wall_diff = ros2_time::WallTime::now() - last_update_wall_time_;
+  tf2::Duration wall_diff = tf2::get_now() - last_update_wall_time_;
   tf2::Duration ros_diff = tf2::get_now() - last_update_ros_time_;
-  float wall_dt = wall_diff.toSec();
+  float wall_dt = tf2::durationToSec(wall_diff);
   float ros_dt = tf2::durationToSec(ros_diff);
   last_update_ros_time_ = tf2::get_now();
-  last_update_wall_time_ = ros2_time::WallTime::now();
+  last_update_wall_time_ = tf2::get_now();
 
   if(ros_dt < 0.0)
   {
@@ -372,12 +371,12 @@ void VisualizationManager::updateTime()
 
   ros_time_elapsed_ = tf2::get_now() - ros_time_begin_;
 
-  if( wall_clock_begin_.isZero() )
+  if( wall_clock_begin_ == tf2::TimePointZero )
   {
-    wall_clock_begin_ = ros2_time::WallTime::now();
+    wall_clock_begin_ = tf2::get_now();
   }
 
-  wall_clock_elapsed_ = ros2_time::WallTime::now() - wall_clock_begin_;
+  wall_clock_elapsed_ = tf2::get_now() - wall_clock_begin_;
 }
 
 void VisualizationManager::updateFrames()
@@ -426,7 +425,7 @@ void VisualizationManager::resetTime()
   //frame_manager_->getTFClient()->clear();  // TODO: clear tf
 
   ros_time_begin_ = tf2::TimePointZero;
-  wall_clock_begin_ = ros2_time::WallTime();
+  wall_clock_begin_ = tf2::TimePointZero;
 
   queueRender();
 }
@@ -485,7 +484,7 @@ Display* VisualizationManager::createDisplay( const QString& class_lookup_name,
 
 double VisualizationManager::getWallClock()
 {
-  return ros2_time::WallTime::now().toSec();
+  return tf2::timeToSec(tf2::get_now());
 }
 
 double VisualizationManager::getROSTime()
@@ -495,7 +494,7 @@ double VisualizationManager::getROSTime()
 
 double VisualizationManager::getWallClockElapsed()
 {
-  return wall_clock_elapsed_.toSec();
+  return tf2::durationToSec(wall_clock_elapsed_);
 }
 
 double VisualizationManager::getROSTimeElapsed()
@@ -556,7 +555,7 @@ void VisualizationManager::threadedQueueThreadFunc()
   /* // TODO: fix this
   while (!shutting_down_)
   {
-    private_->threaded_queue_.callOne(ros2_time::WallDuration(0.1));
+    private_->threaded_queue_.callOne(tf2::durationFromSec(0.1));
   }
   */
 }

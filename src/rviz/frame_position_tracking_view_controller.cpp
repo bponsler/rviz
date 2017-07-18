@@ -116,7 +116,7 @@ void FramePositionTrackingViewController::updateTargetSceneNode()
   }
 
 // Need to incorporate this functionality somehow....  Maybe right into TfFrameProperty itself.
-/////  if( frame_manager_->transformHasProblems( getTargetFrame().toStdString(), ros2_time::Time(), error ))
+/////  if( frame_manager_->transformHasProblems( getTargetFrame().toStdString(), tf2::TimePointZero, error ))
 /////  {
 /////    // target_prop->setToError();
 /////    global_status_->setStatus( StatusProperty::Error, "Target Frame", QString::fromStdString( error ));

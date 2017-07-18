@@ -40,7 +40,7 @@
 #include "rviz/window_manager_interface.h"
 #include "rviz/panel.h"
 
-#include <ros2_time/time.hpp>
+#include <tf2/time.h>
 #include <rclcpp/node.hpp>
 
 class QSplashScreen;
@@ -348,7 +348,7 @@ protected:
   QStatusBar* original_status_bar_;
 
   int frame_count_;
-  ros2_time::WallTime last_fps_calc_time_;
+  tf2::TimePoint last_fps_calc_time_;
 
   QString error_message_; ///< Error message (if any) from most recent saveDisplayConfig() call.
 };

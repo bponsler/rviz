@@ -42,7 +42,7 @@ add_library( ${PROJECT_NAME} SHARED
   #image/image_display_base.cpp
   loading_dialog.cpp
   message_filter_display.h
-  #mesh_loader.cpp
+  mesh_loader.cpp
   new_object_dialog.cpp
   add_display_dialog.cpp
   ogre_helpers/apply_visibility_bits.cpp
@@ -96,10 +96,10 @@ add_library( ${PROJECT_NAME} SHARED
   properties/tf_frame_property.cpp
   properties/vector_property.cpp
   render_panel.cpp
-  #robot/robot_link.cpp
-  #robot/robot_joint.cpp
-  #robot/robot.cpp
-  #robot/tf_link_updater.cpp
+  robot/robot_link.cpp
+  robot/robot_joint.cpp
+  robot/robot.cpp
+  robot/tf_link_updater.cpp
   scaled_image_widget.cpp
   screenshot_dialog.cpp
   selection_panel.cpp
@@ -116,7 +116,6 @@ add_library( ${PROJECT_NAME} SHARED
   visualization_frame.cpp
   visualization_manager.cpp
   visualizer_app.cpp
-  #wait_for_master_dialog.cpp
   widget_geometry_change_detector.cpp
   tool_properties_panel.cpp
   yaml_config_reader.cpp

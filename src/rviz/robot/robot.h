@@ -173,12 +173,12 @@ public:
   {
   public:
     virtual RobotLink* createLink( Robot* robot,
-                                   const boost::shared_ptr<const urdf::Link>& link,
+                                   const std::shared_ptr<const urdf::Link>& link,
                                    const std::string& parent_joint_name,
                                    bool visual,
                                    bool collision);
     virtual RobotJoint* createJoint( Robot* robot,
-                                     const boost::shared_ptr<const urdf::Joint>& joint);
+                                     const std::shared_ptr<const urdf::Joint>& joint);
   };
 
   /** Call this before load() to subclass the RobotLink or RobotJoint class used in the link property.

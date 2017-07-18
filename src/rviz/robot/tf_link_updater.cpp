@@ -30,8 +30,6 @@
 #include "tf_link_updater.h"
 #include "frame_manager.h"
 
-#include <tf/tf.h>
-
 #include <OgreVector3.h>
 #include <OgreQuaternion.h>
 
@@ -51,12 +49,12 @@ bool TFLinkUpdater::getLinkTransforms(const std::string& _link_name, Ogre::Vecto
   std::string link_name = _link_name;
   if (!tf_prefix_.empty())
   {
-    link_name = tf::resolve(tf_prefix_, link_name);
+    link_name = link_name;  // TODO: need tf::resolve
   }
 
   Ogre::Vector3 position;
   Ogre::Quaternion orientation;
-  if (!frame_manager_->getTransform(link_name, ros::Time(), position, orientation))
+  if (!frame_manager_->getTransform(link_name, tf2::TimePointZero, position, orientation))
   {
     std::stringstream ss;
     ss << "No transform from [" << link_name << "] to [" << frame_manager_->getFixedFrame() << "]";

@@ -52,9 +52,9 @@
 #include <sensor_msgs_util/image_encodings.h>
 
 #include <ros2_console/assert.hpp>
-#include <ros2_time/time.hpp>
 #include <rclcpp/node.hpp>
 #include <rclcpp/time.hpp>
+#include <tf2/time.h>
 
 #include "rviz/ogre_helpers/arrow.h"
 #include "rviz/ogre_helpers/axes.h"
@@ -704,7 +704,7 @@ bool SelectionManager::render(Ogre::Viewport* viewport, Ogre::TexturePtr tex,
   // make sure the same objects are visible as in the original viewport
   render_viewport->setVisibilityMask( viewport->getVisibilityMask() );
 
-  ros2_time::WallTime start = ros2_time::WallTime::now();
+  tf2::TimePoint start = tf2::get_now();
 
   // update & force ogre to render the scene
   Ogre::MaterialManager::getSingleton().addListener(this);
@@ -724,9 +724,9 @@ bool SelectionManager::render(Ogre::Viewport* viewport, Ogre::TexturePtr tex,
   vis_manager_->getSceneManager()->_renderScene(main_view->getCamera(), main_view, false);
   vis_manager_->getSceneManager()->removeRenderQueueListener(this);
 
-  ros2_time::WallTime end = ros2_time::WallTime::now();
-  ros2_time::WallDuration d = end - start;
-//  ROS_DEBUG("Render took [%f] msec", d.toSec() * 1000.0f);
+  tf2::TimePoint end = tf2::get_now();
+  tf2::Duration d = end - start;
+//  ROS_DEBUG("Render took [%f] msec", tf2::durationToSec(d) * 1000.0f);
 
   Ogre::MaterialManager::getSingleton().removeListener(this);
 
