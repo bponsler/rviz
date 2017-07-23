@@ -33,15 +33,11 @@
 
 #include <deque>
 
-#include <boost/shared_ptr.hpp>
-#include <boost/thread/mutex.hpp>
-
 #ifndef Q_MOC_RUN
 #include <message_filters/subscriber.h>
-#include <tf2_ros/message_filter.h>
 #endif
 
-#include <nav_msgs/Odometry.h>
+#include <nav_msgs/msg/odometry.hpp>
 
 #include "rviz/display.h"
 
@@ -56,7 +52,7 @@ class RosTopicProperty;
 
 /**
  * \class OdometryDisplay
- * \brief Accumulates and displays the pose from a nav_msgs::Odometry message
+ * \brief Accumulates and displays the pose from a nav_msgs::msg::Odometry message
  */
 class OdometryDisplay: public Display
 {
@@ -88,17 +84,16 @@ private:
   void unsubscribe();
   void clear();
 
-  void incomingMessage( const nav_msgs::Odometry::ConstPtr& message );
-  void transformArrow( const nav_msgs::Odometry::ConstPtr& message, Arrow* arrow );
+  void incomingMessage( const nav_msgs::msg::Odometry::SharedPtr message );
+  void transformArrow( const nav_msgs::msg::Odometry::SharedPtr message, Arrow* arrow );
 
   typedef std::deque<Arrow*> D_Arrow;
   D_Arrow arrows_;
 
   uint32_t messages_received_;
 
-  nav_msgs::Odometry::ConstPtr last_used_message_;
-  message_filters::Subscriber<nav_msgs::Odometry> sub_;
-  tf::MessageFilter<nav_msgs::Odometry>* tf_filter_;
+  nav_msgs::msg::Odometry::SharedPtr last_used_message_;
+  rclcpp::subscription::Subscription<nav_msgs::msg::Odometry>::SharedPtr sub_;
 
   ColorProperty* color_property_;
   RosTopicProperty* topic_property_;

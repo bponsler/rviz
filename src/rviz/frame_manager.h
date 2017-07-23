@@ -140,7 +140,7 @@ public:
   template<typename Header>
   bool transform(const Header& header, const geometry_msgs::msg::Pose& pose, Ogre::Vector3& position, Ogre::Quaternion& orientation)
   {
-    return transform(header.frame_id, header.stamp, pose, position, orientation);
+    return transform(header.frame_id, tf2_ros::fromMsg(header.stamp), pose, position, orientation);
   }
 
   /** @brief Transform a pose from a frame into the fixed frame.

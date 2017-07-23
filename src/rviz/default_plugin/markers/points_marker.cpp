@@ -54,11 +54,11 @@ PointsMarker::~PointsMarker()
   delete points_;
 }
 
-void PointsMarker::onNewMessage(const MarkerConstPtr& old_message, const MarkerConstPtr& new_message)
+void PointsMarker::onNewMessage(const MarkerPtr& old_message, const MarkerPtr& new_message)
 {
-  ROS_ASSERT(new_message->type == visualization_msgs::Marker::POINTS ||
-             new_message->type == visualization_msgs::Marker::CUBE_LIST ||
-             new_message->type == visualization_msgs::Marker::SPHERE_LIST);
+  ROS_ASSERT(new_message->type == visualization_msgs::msg::Marker::POINTS ||
+             new_message->type == visualization_msgs::msg::Marker::CUBE_LIST ||
+             new_message->type == visualization_msgs::msg::Marker::SPHERE_LIST);
 
   if (!points_)
   {
@@ -72,15 +72,15 @@ void PointsMarker::onNewMessage(const MarkerConstPtr& old_message, const MarkerC
 
   switch (new_message->type)
   {
-  case visualization_msgs::Marker::POINTS:
+  case visualization_msgs::msg::Marker::POINTS:
     points_->setRenderMode(PointCloud::RM_SQUARES);
     points_->setDimensions(new_message->scale.x, new_message->scale.y, 0.0f);
     break;
-  case visualization_msgs::Marker::CUBE_LIST:
+  case visualization_msgs::msg::Marker::CUBE_LIST:
     points_->setRenderMode(PointCloud::RM_BOXES);
     points_->setDimensions(scale.x, scale.y, scale.z);
     break;
-  case visualization_msgs::Marker::SPHERE_LIST:
+  case visualization_msgs::msg::Marker::SPHERE_LIST:
     points_->setRenderMode(PointCloud::RM_SPHERES);
     points_->setDimensions(scale.x, scale.y, scale.z);
     break;
@@ -124,7 +124,7 @@ void PointsMarker::onNewMessage(const MarkerConstPtr& old_message, const MarkerC
 
     if (has_per_point_color)
     {
-      const std_msgs::ColorRGBA& color = new_message->colors[i];
+      const std_msgs::msg::ColorRGBA& color = new_message->colors[i];
       r = color.r;
       g = color.g;
       b = color.b;

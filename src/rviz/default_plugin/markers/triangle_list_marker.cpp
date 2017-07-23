@@ -61,9 +61,9 @@ TriangleListMarker::~TriangleListMarker()
   Ogre::MaterialManager::getSingleton().remove(material_->getName());
 }
 
-void TriangleListMarker::onNewMessage(const MarkerConstPtr& old_message, const MarkerConstPtr& new_message)
+void TriangleListMarker::onNewMessage(const MarkerPtr& old_message, const MarkerPtr& new_message)
 {
-  ROS_ASSERT(new_message->type == visualization_msgs::Marker::TRIANGLE_LIST);
+  ROS_ASSERT(new_message->type == visualization_msgs::msg::Marker::TRIANGLE_LIST);
 
   size_t num_points = new_message->points.size();
   if( (num_points % 3) != 0 || num_points == 0 )
@@ -101,7 +101,7 @@ void TriangleListMarker::onNewMessage(const MarkerConstPtr& old_message, const M
 
     ss << "Material";
     material_name_ = ss.str();
-    material_ = Ogre::MaterialManager::getSingleton().create( material_name_, ROS_PACKAGE_NAME );
+    material_ = Ogre::MaterialManager::getSingleton().create( material_name_, "rviz" );
     material_->setReceiveShadows(false);
     material_->getTechnique(0)->setLightingEnabled(true);
     material_->setCullingMode(Ogre::CULL_NONE);

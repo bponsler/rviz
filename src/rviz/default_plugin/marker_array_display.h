@@ -55,7 +55,7 @@ protected:
   virtual void unsubscribe();
 
 private:
-  void handleMarkerArray( const visualization_msgs::msg::MarkerArray::ConstPtr& array );
+  void handleMarkerArray( const visualization_msgs::msg::MarkerArray::SharedPtr array );
 };
 
 } // end namespace rviz

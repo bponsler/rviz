@@ -30,8 +30,8 @@
 #ifndef RVIZ_TEMPERATURE_DISPLAY_H
 #define RVIZ_TEMPERATURE_DISPLAY_H
 
-#include <sensor_msgs/Temperature.h>
-#include <sensor_msgs/PointCloud2.h>
+#include <sensor_msgs/msg/temperature.hpp>
+#include <sensor_msgs/msg/point_cloud2.hpp>
 
 #include "rviz/message_filter_display.h"
 
@@ -43,10 +43,10 @@ class PointCloudCommon;
 
 /**
  * \class TemperatureDisplay
- * \brief Displays a Temperature message of type sensor_msgs::Temperature
+ * \brief Displays a Temperature message of type sensor_msgs::msg::Temperature
  *
  */
-class TemperatureDisplay: public MessageFilterDisplay<sensor_msgs::Temperature>
+class TemperatureDisplay: public MessageFilterDisplay<sensor_msgs::msg::Temperature>
 {
 Q_OBJECT
 public:
@@ -65,8 +65,14 @@ protected:
   virtual void onInitialize();
 
   /** @brief Process a single message.  Overridden from MessageFilterDisplay. */
-  virtual void processMessage( const sensor_msgs::TemperatureConstPtr& msg );
+  virtual void processMessage( const sensor_msgs::msg::Temperature::SharedPtr msg );
 
+  /** @brief Get the frame for the given message. */
+  virtual std::string getMsgFrame(const sensor_msgs::msg::Temperature::SharedPtr msg);
+
+  /** @brief Get the time stamp for the given message. */
+  virtual tf2::TimePoint getMsgTime(const sensor_msgs::msg::Temperature::SharedPtr msg);
+  
   IntProperty* queue_size_property_;
 
   PointCloudCommon* point_cloud_common_;

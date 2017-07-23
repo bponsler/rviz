@@ -53,9 +53,9 @@ LineStripMarker::~LineStripMarker()
   delete lines_;
 }
 
-void LineStripMarker::onNewMessage(const MarkerConstPtr& old_message, const MarkerConstPtr& new_message)
+void LineStripMarker::onNewMessage(const MarkerPtr& old_message, const MarkerPtr& new_message)
 {
-  ROS_ASSERT(new_message->type == visualization_msgs::Marker::LINE_STRIP);
+  ROS_ASSERT(new_message->type == visualization_msgs::msg::Marker::LINE_STRIP);
 
   if (!lines_)
   {
@@ -94,7 +94,7 @@ void LineStripMarker::onNewMessage(const MarkerConstPtr& old_message, const Mark
     Ogre::ColourValue c;
     if (has_per_point_color)
     {
-      const std_msgs::ColorRGBA& color = new_message->colors[i];
+      const std_msgs::msg::ColorRGBA& color = new_message->colors[i];
       c.r = color.r;
       c.g = color.g;
       c.b = color.b;

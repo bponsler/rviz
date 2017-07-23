@@ -36,6 +36,8 @@
 
 #include <map>
 
+#include <std_msgs/msg/string.hpp>
+
 namespace Ogre
 {
 class Entity;
@@ -82,10 +84,21 @@ private Q_SLOTS:
   void updateRobotDescription();
 
 protected:
+  /** @brief Called when robot description data is received 
+   * @param msg is the robot description data
+   */
+  void onDescription(const std_msgs::msg::String::SharedPtr msg);
+
+  /** @brief Unsubscribe from robot description data. */
+  virtual void unsubscribe();
+
+  /** @brief Subscribe to robot description data. */
+  virtual void subscribe();
+  
   /** @brief Loads a URDF from the ros-param named by our
    * "Robot Description" property, iterates through the links, and
    * loads any necessary models. */
-  virtual void load();
+  virtual void load(const std::string& content);
 
   // overrides from Display
   virtual void onEnable();
@@ -105,6 +118,9 @@ protected:
   StringProperty* robot_description_property_;
   FloatProperty* alpha_property_;
   StringProperty* tf_prefix_property_;
+
+  /** Subscribe to robot description data. */
+  rclcpp::subscription::Subscription<std_msgs::msg::String>::SharedPtr description_sub_;
 };
 
 } // namespace rviz

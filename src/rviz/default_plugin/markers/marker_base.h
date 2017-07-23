@@ -33,11 +33,10 @@
 #include "rviz/selection/forwards.h"
 #include "rviz/interactive_object.h"
 
-#include <visualization_msgs/Marker.h>
+#include <visualization_msgs/msg/marker.hpp>
 
-#include <ros/time.h>
-
-#include <boost/shared_ptr.hpp>
+#include <ros2_console/assert.hpp>
+#include <tf2/time.h>
 
 namespace Ogre
 {
@@ -59,20 +58,20 @@ typedef std::set<Ogre::MaterialPtr> S_MaterialPtr;
 class MarkerBase
 {
 public:
-  typedef visualization_msgs::Marker Marker;
-  typedef visualization_msgs::Marker::ConstPtr MarkerConstPtr;
+  typedef visualization_msgs::msg::Marker Marker;
+  typedef visualization_msgs::msg::Marker::SharedPtr MarkerPtr;
 
   MarkerBase( MarkerDisplay* owner, DisplayContext* context, Ogre::SceneNode* parent_node );
 
   virtual ~MarkerBase();
 
   void setMessage(const Marker& message);
-  void setMessage(const MarkerConstPtr& message);
+  void setMessage(const MarkerPtr& message);
   bool expired();
 
   void updateFrameLocked();
 
-  const MarkerConstPtr& getMessage() const { return message_; }
+  const MarkerPtr& getMessage() const { return message_; }
 
   MarkerID getID() { return MarkerID(message_->ns, message_->id); }
   std::string getStringID()
@@ -93,8 +92,8 @@ public:
   virtual S_MaterialPtr getMaterials() { return S_MaterialPtr(); }
 
 protected:
-  bool transform(const MarkerConstPtr& message, Ogre::Vector3& pos, Ogre::Quaternion& orient, Ogre::Vector3& scale);
-  virtual void onNewMessage(const MarkerConstPtr& old_message, const MarkerConstPtr& new_message) = 0;
+  bool transform(const MarkerPtr& message, Ogre::Vector3& pos, Ogre::Quaternion& orient, Ogre::Vector3& scale);
+  virtual void onNewMessage(const MarkerPtr& old_message, const MarkerPtr& new_message) = 0;
 
   void extractMaterials( Ogre::Entity *entity, S_MaterialPtr &materials );
 
@@ -103,13 +102,13 @@ protected:
 
   Ogre::SceneNode* scene_node_;
 
-  MarkerConstPtr message_;
+  MarkerPtr message_;
 
-  ros::Time expiration_;
+  tf2::TimePoint expiration_;
 
-  boost::shared_ptr<MarkerSelectionHandler> handler_;
+  std::shared_ptr<MarkerSelectionHandler> handler_;
 };
-typedef boost::shared_ptr<MarkerBase> MarkerBasePtr;
+typedef std::shared_ptr<MarkerBase> MarkerBasePtr;
 
 }
 

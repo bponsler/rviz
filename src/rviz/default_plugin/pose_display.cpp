@@ -117,7 +117,8 @@ private:
 };
 
 PoseDisplay::PoseDisplay()
-  : pose_valid_( false )
+  : MessageFilterDisplay("geometry_msgs/PoseStamped")
+  , pose_valid_( false )
 {
   shape_property_ = new EnumProperty( "Shape", "Arrow", "Shape to display the pose as.",
                                       this, SLOT( updateShapeChoice() ));
@@ -288,6 +289,16 @@ void PoseDisplay::reset()
   updateShapeVisibility();
 }
 
+std::string PoseDisplay::getMsgFrame(const geometry_msgs::msg::PoseStamped::SharedPtr msg)
+{
+  return msg->header.frame_id;
+}
+
+tf2::TimePoint PoseDisplay::getMsgTime(const geometry_msgs::msg::PoseStamped::SharedPtr msg)
+{
+  return tf2_ros::fromMsg(msg->header.stamp);
+}
+  
 } // namespace rviz
 
 #include <pluginlib/class_list_macros.h>

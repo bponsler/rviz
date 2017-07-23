@@ -53,7 +53,7 @@ public:
   void setHighlightColor( float r, float g, float b );
 
 protected:
-  virtual void onNewMessage(const MarkerConstPtr& old_message, const MarkerConstPtr& new_message);
+  virtual void onNewMessage(const MarkerPtr& old_message, const MarkerPtr& new_message);
 
   PointCloud* points_;
 };

@@ -77,8 +77,8 @@ RobotModelDisplay::RobotModelDisplay()
   alpha_property_->setMin( 0.0 );
   alpha_property_->setMax( 1.0 );
 
-  robot_description_property_ = new StringProperty( "Robot Description", "robot_description",
-                                                    "Name of the parameter to search for to load the robot description.",
+  robot_description_property_ = new StringProperty( "Robot Description Topic", "robot_description",
+                                                    "The topic where the robot description is published.",
                                                     this, SLOT( updateRobotDescription() ));
 
   tf_prefix_property_ = new StringProperty( "TF Prefix", "",
@@ -114,7 +114,8 @@ void RobotModelDisplay::updateRobotDescription()
 {
   if( isEnabled() )
   {
-    load();
+    unsubscribe();
+    subscribe();
     context_->queueRender();
   }
 }
@@ -137,26 +138,29 @@ void RobotModelDisplay::updateTfPrefix()
   context_->queueRender();
 }
 
-void RobotModelDisplay::load()
+void RobotModelDisplay::unsubscribe()
 {
-  std::string content;
-  if( !update_nh_.getParam( robot_description_property_->getStdString(), content ))
-  {
-    std::string loc;
-    if( update_nh_.searchParam( robot_description_property_->getStdString(), loc ))
-    {
-      update_nh_.getParam( loc, content );
-    }
-    else
-    {
-      clear();
-      setStatus( StatusProperty::Error, "URDF",
-                 "Parameter [" + robot_description_property_->getString()
-                 + "] does not exist, and was not found by searchParam()" );
-      return;
-    }
-  }
+  description_sub_.reset();
+}
 
+void RobotModelDisplay::subscribe()
+{
+  // Make sure the topic is valid
+  const std::string topic = robot_description_property_->getStdString();
+  if (topic.size() == 0) return;
+    
+  rmw_qos_profile_t qos = rmw_qos_profile_default;
+  qos.depth = 1;
+  qos.durability = RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL;
+  
+  description_sub_ = update_nh_->create_subscription<std_msgs::msg::String>(
+    topic,
+    std::bind(&RobotModelDisplay::onDescription, this, std::placeholders::_1),
+    qos);
+}
+  
+void RobotModelDisplay::load(const std::string& content)
+{
   if( content.empty() )
   {
     clear();
@@ -189,20 +193,26 @@ void RobotModelDisplay::load()
   }
 
   setStatus( StatusProperty::Ok, "URDF", "URDF parsed OK" );
-  robot_->load( descr );
-  robot_->update( TFLinkUpdater( context_->getFrameManager(),
-                                 std::bind( linkUpdaterStatusFunction, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, this ),
-                                 tf_prefix_property_->getStdString() ));
+  robot_->load( descr );  // TODO: this was crashing until loaded Cube mesh at startup
+  robot_->update( TFLinkUpdater(
+                    context_->getFrameManager(),
+		    std::bind( linkUpdaterStatusFunction,
+			       std::placeholders::_1,
+			       std::placeholders::_2,
+			       std::placeholders::_3,
+			       this ),
+		    tf_prefix_property_->getStdString() ));
 }
 
 void RobotModelDisplay::onEnable()
 {
-  load();
+  subscribe();
   robot_->setVisible( true );
 }
 
 void RobotModelDisplay::onDisable()
 {
+  unsubscribe();
   robot_->setVisible( false );
   clear();
 }
@@ -241,6 +251,11 @@ void RobotModelDisplay::reset()
 {
   Display::reset();
   has_new_transforms_ = true;
+}
+
+void RobotModelDisplay::onDescription(const std_msgs::msg::String::SharedPtr msg)
+{
+  load(msg->data);
 }
 
 } // namespace rviz

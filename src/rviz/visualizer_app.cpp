@@ -257,7 +257,7 @@ bool VisualizerApp::init( int argc, char** argv )
 
     if( enable_ogre_log )
     {
-      //OgreLogging::useRosLog(); // TODO: enable once ogre is working
+      OgreLogging::useRosLog();
     }
 
     if ( force_gl_version )
@@ -292,8 +292,7 @@ bool VisualizerApp::init( int argc, char** argv )
       frame_->getManager()->setFixedFrame( QString::fromStdString( fixed_frame ));
     }
 
-    // TODO: once selection manager is included
-    //frame_->getManager()->getSelectionManager()->setDebugMode( verbose );
+    frame_->getManager()->getSelectionManager()->setDebugMode( verbose );
 
     frame_->show();
 

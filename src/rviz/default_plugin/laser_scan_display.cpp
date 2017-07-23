@@ -106,17 +106,14 @@ void LaserScanDisplay::processMessage( const sensor_msgs::msg::LaserScan::Shared
   point_cloud_common_->addMessage( cloud );
 }
 
-std::string LaserScanDisplay::getMsgFrame(const typename sensor_msgs::msg::LaserScan::SharedPtr msg)
+std::string LaserScanDisplay::getMsgFrame(const sensor_msgs::msg::LaserScan::SharedPtr msg)
 {
   return msg->header.frame_id;
 }
 
-tf2::TimePoint LaserScanDisplay::getMsgTime(const typename sensor_msgs::msg::LaserScan::SharedPtr msg)
+tf2::TimePoint LaserScanDisplay::getMsgTime(const sensor_msgs::msg::LaserScan::SharedPtr msg)
 {
-  tf2::TimePoint tp(
-      std::chrono::seconds(msg->header.stamp.sec) +
-      std::chrono::nanoseconds(msg->header.stamp.nanosec));
-  return tp;
+  return tf2_ros::fromMsg(msg->header.stamp);
 }
 
 void LaserScanDisplay::update( float wall_dt, float ros_dt )

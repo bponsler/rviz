@@ -45,6 +45,7 @@ namespace rviz
 {
 
 PolygonDisplay::PolygonDisplay()
+  : MessageFilterDisplay("geometry_msgs/PolygonStamped")
 {
   color_property_ = new ColorProperty( "Color", QColor( 25, 255, 0 ),
                                        "Color to draw the polygon.", this, SLOT( queueRender() ));
@@ -126,6 +127,16 @@ void PolygonDisplay::processMessage(const geometry_msgs::msg::PolygonStamped::Sh
   }
 }
 
+std::string PolygonDisplay::getMsgFrame(const geometry_msgs::msg::PolygonStamped::SharedPtr msg)
+{
+  return msg->header.frame_id;
+}
+
+tf2::TimePoint PolygonDisplay::getMsgTime(const geometry_msgs::msg::PolygonStamped::SharedPtr msg)
+{
+  return tf2_ros::fromMsg(msg->header.stamp);
+}
+  
 } // namespace rviz
 
 #include <pluginlib/class_list_macros.h>

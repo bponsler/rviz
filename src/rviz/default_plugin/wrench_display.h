@@ -40,6 +40,12 @@ protected:
     virtual void onInitialize();
     virtual void reset();
 
+    /** @brief Get the frame for the given message. */
+    virtual std::string getMsgFrame(const geometry_msgs::msg::WrenchStamped::SharedPtr msg);
+
+    /** @brief Get the time stamp for the given message. */
+    virtual tf2::TimePoint getMsgTime(const geometry_msgs::msg::WrenchStamped::SharedPtr msg);
+    
 private Q_SLOTS:
     // Helper function to apply color and alpha to all visuals.
     void updateColorAndAlpha();
@@ -52,7 +58,7 @@ private:
     // Storage for the list of visuals par each joint intem
     // Storage for the list of visuals.  It is a circular buffer where
     // data gets popped from the front (oldest) and pushed to the back (newest)
-    boost::circular_buffer<boost::shared_ptr<WrenchVisual> > visuals_;
+    boost::circular_buffer<std::shared_ptr<WrenchVisual> > visuals_;
 
     // Property objects for user-editable properties.
     rviz::ColorProperty *force_color_property_, *torque_color_property_;

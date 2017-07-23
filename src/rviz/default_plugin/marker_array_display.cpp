@@ -38,7 +38,7 @@ namespace rviz
 MarkerArrayDisplay::MarkerArrayDisplay()
   : MarkerDisplay()
 {
-  marker_topic_property_->setMessageType( QString::fromStdString( ros::message_traits::datatype<visualization_msgs::MarkerArray>() ));
+  marker_topic_property_->setMessageType( QString::fromStdString( "visualization_msgs::MarkerArray" ));
   marker_topic_property_->setValue( "visualization_marker_array" );
   marker_topic_property_->setDescription( "visualization_msgs::MarkerArray topic to subscribe to." );
 
@@ -56,14 +56,17 @@ void MarkerArrayDisplay::subscribe()
   std::string topic = marker_topic_property_->getTopicStd();
   if( !topic.empty() )
   {
-    array_sub_.shutdown();
+    array_sub_.reset();
 
     try
     {
-      array_sub_ = update_nh_.subscribe( topic, queue_size_property_->getInt(), &MarkerArrayDisplay::handleMarkerArray, this );
+      array_sub_ = update_nh_->create_subscription<visualization_msgs::msg::MarkerArray>(
+        topic,
+	queue_size_property_->getInt(),
+	std::bind(&MarkerArrayDisplay::handleMarkerArray, this, std::placeholders::_1));
       setStatus( StatusProperty::Ok, "Topic", "OK" );
     }
-    catch( ros::Exception& e )
+    catch( rclcpp::exceptions::RCLError& e )
     {
       setStatus( StatusProperty::Error, "Topic", QString( "Error subscribing: " ) + e.what() );
     }
@@ -72,12 +75,12 @@ void MarkerArrayDisplay::subscribe()
 
 void MarkerArrayDisplay::unsubscribe()
 {
-  array_sub_.shutdown();
+  array_sub_.reset();
 }
 
 // I seem to need this wrapper function to make the compiler like my
 // function pointer in the .subscribe() call above.
-void MarkerArrayDisplay::handleMarkerArray( const visualization_msgs::MarkerArray::ConstPtr& array )
+void MarkerArrayDisplay::handleMarkerArray( const visualization_msgs::msg::MarkerArray::SharedPtr array )
 {
   incomingMarkerArray( array );
 }

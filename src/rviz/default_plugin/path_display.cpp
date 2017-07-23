@@ -35,8 +35,6 @@
 #include <OgreBillboardSet.h>
 #include <OgreMatrix4.h>
 
-#include <tf/transform_listener.h>
-
 #include "rviz/display_context.h"
 #include "rviz/frame_manager.h"
 #include "rviz/properties/enum_property.h"
@@ -53,6 +51,7 @@ namespace rviz
 {
 
 PathDisplay::PathDisplay()
+  : MessageFilterDisplay("nav_msgs/Path")
 {
   style_property_ = new EnumProperty( "Line Style", "Lines",
                                       "The rendering operation to use to draw the grid lines.",
@@ -205,14 +204,14 @@ void PathDisplay::updateBufferLength()
 
 }
 
-bool validateFloats( const nav_msgs::Path& msg )
+bool validateFloats( const nav_msgs::msg::Path& msg )
 {
   bool valid = true;
   valid = valid && validateFloats( msg.poses );
   return valid;
 }
 
-void PathDisplay::processMessage( const nav_msgs::Path::ConstPtr& msg )
+void PathDisplay::processMessage( const nav_msgs::msg::Path::SharedPtr msg )
 {
   // Calculate index of oldest element in cyclic buffer
   size_t bufferIndex = messages_received_ % buffer_length_property_->getInt();
@@ -295,6 +294,16 @@ void PathDisplay::processMessage( const nav_msgs::Path::ConstPtr& msg )
 
 }
 
+std::string PathDisplay::getMsgFrame(const nav_msgs::msg::Path::SharedPtr msg)
+{
+  return msg->header.frame_id;
+}
+
+tf2::TimePoint PathDisplay::getMsgTime(const nav_msgs::msg::Path::SharedPtr msg)
+{
+  return tf2_ros::fromMsg(msg->header.stamp);
+}
+  
 } // namespace rviz
 
 #include <pluginlib/class_list_macros.h>

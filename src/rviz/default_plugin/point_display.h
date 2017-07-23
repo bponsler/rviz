@@ -46,12 +46,19 @@ namespace rviz
         void updateHistoryLength();
 
 	// Function to handle an incoming ROS message.
+
+	/** @brief Get the frame for the given message. */
+	virtual std::string getMsgFrame(const geometry_msgs::msg::PointStamped::SharedPtr msg);
+
+	/** @brief Get the time stamp for the given message. */
+	virtual tf2::TimePoint getMsgTime(const geometry_msgs::msg::PointStamped::SharedPtr msg);
+	
     private:
 	void processMessage( const geometry_msgs::msg::PointStamped::SharedPtr msg );
 
         // Storage for the list of visuals.  It is a circular buffer where
         // data gets popped from the front (oldest) and pushed to the back (newest)
-        boost::circular_buffer<boost::shared_ptr<PointStampedVisual> > visuals_;
+        boost::circular_buffer<std::shared_ptr<PointStampedVisual> > visuals_;
 
 	// Property objects for user-editable properties.
 	rviz::ColorProperty *color_property_;

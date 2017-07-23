@@ -30,8 +30,6 @@
 #include <OgreSceneNode.h>
 #include <OgreSceneManager.h>
 
-#include <ros/time.h>
-
 #include "rviz/default_plugin/point_cloud_common.h"
 #include "rviz/default_plugin/point_cloud_transformers.h"
 #include "rviz/display_context.h"
@@ -46,17 +44,14 @@ namespace rviz
 {
 
 TemperatureDisplay::TemperatureDisplay()
-  : point_cloud_common_( new PointCloudCommon( this ))
+  : MessageFilterDisplay("sensor_msgs/Temperature")
+  , point_cloud_common_( new PointCloudCommon( this ))
 {
   queue_size_property_ = new IntProperty( "Queue Size", 10,
                                           "Advanced: set the size of the incoming Temperature message queue. "
                                           " Increasing this is useful if your incoming TF data is delayed significantly "
                                           "from your Temperature data, but it can greatly increase memory usage if the messages are big.",
                                           this, SLOT( updateQueueSize() ));
-
-  // PointCloudCommon sets up a callback queue with a thread for each
-  // instance.  Use that for processing incoming messages.
-  update_nh_.setCallbackQueue( point_cloud_common_->getCallbackQueue() );
 }
 
 TemperatureDisplay::~TemperatureDisplay()
@@ -79,33 +74,33 @@ void TemperatureDisplay::onInitialize()
 
 void TemperatureDisplay::updateQueueSize()
 {
-  tf_filter_->setQueueSize( (uint32_t) queue_size_property_->getInt() );
+  // TODO: update queue size
 }
 
-void TemperatureDisplay::processMessage( const sensor_msgs::TemperatureConstPtr& msg )
+void TemperatureDisplay::processMessage( const sensor_msgs::msg::Temperature::SharedPtr msg )
 {
-  sensor_msgs::PointCloud2Ptr filtered(new sensor_msgs::PointCloud2);
+  sensor_msgs::msg::PointCloud2::SharedPtr filtered(new sensor_msgs::msg::PointCloud2);
 
   // Create fields
-  sensor_msgs::PointField x;
+  sensor_msgs::msg::PointField x;
   x.name = "x";
   x.offset = 0;
-  x.datatype = sensor_msgs::PointField::FLOAT32;
+  x.datatype = sensor_msgs::msg::PointField::FLOAT32;
   x.count = 1;
-  sensor_msgs::PointField y;
+  sensor_msgs::msg::PointField y;
   y.name = "y";
   y.offset = 4;
-  y.datatype = sensor_msgs::PointField::FLOAT32;
+  y.datatype = sensor_msgs::msg::PointField::FLOAT32;
   y.count = 1;
-  sensor_msgs::PointField z;
+  sensor_msgs::msg::PointField z;
   z.name = "z";
   z.offset = 8;
-  z.datatype = sensor_msgs::PointField::FLOAT32;
+  z.datatype = sensor_msgs::msg::PointField::FLOAT32;
   z.count = 1;
-  sensor_msgs::PointField temperature;
+  sensor_msgs::msg::PointField temperature;
   temperature.name = "temperature";
   temperature.offset = 12;
-  temperature.datatype = sensor_msgs::PointField::FLOAT64;
+  temperature.datatype = sensor_msgs::msg::PointField::FLOAT64;
   temperature.count = 1;
 
   // Create pointcloud from message
@@ -149,6 +144,16 @@ void TemperatureDisplay::reset()
   point_cloud_common_->reset();
 }
 
+std::string TemperatureDisplay::getMsgFrame(const sensor_msgs::msg::Temperature::SharedPtr msg)
+{
+  return msg->header.frame_id;
+}
+
+tf2::TimePoint TemperatureDisplay::getMsgTime(const sensor_msgs::msg::Temperature::SharedPtr msg)
+{
+  return tf2_ros::fromMsg(msg->header.stamp);
+}
+  
 } // namespace rviz
 
 #include <pluginlib/class_list_macros.h>

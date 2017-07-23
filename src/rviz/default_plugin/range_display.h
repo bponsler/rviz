@@ -30,7 +30,7 @@
 #ifndef RANGE_DISPLAY_H
 #define RANGE_DISPLAY_H
 
-#include <sensor_msgs/Range.h>
+#include <sensor_msgs/msg/range.hpp>
 
 #include "rviz/message_filter_display.h"
 
@@ -48,9 +48,9 @@ class IntProperty;
 
 /**
  * \class RangeDisplay
- * \brief Displays a sensor_msgs::Range message as a cone.
+ * \brief Displays a sensor_msgs::msg::Range message as a cone.
  */
-class RangeDisplay: public MessageFilterDisplay<sensor_msgs::Range>
+class RangeDisplay: public MessageFilterDisplay<sensor_msgs::msg::Range>
 {
 Q_OBJECT
 public:
@@ -65,8 +65,14 @@ protected:
   virtual void onInitialize();
 
   /** @brief Overridden from MessageFilterDisplay. */
-  virtual void processMessage( const sensor_msgs::Range::ConstPtr& msg );
+  virtual void processMessage( const sensor_msgs::msg::Range::SharedPtr msg );
 
+  /** @brief Get the frame for the given message. */
+  virtual std::string getMsgFrame(const sensor_msgs::msg::Range::SharedPtr msg);
+
+  /** @brief Get the time stamp for the given message. */
+  virtual tf2::TimePoint getMsgTime(const sensor_msgs::msg::Range::SharedPtr msg);
+  
 private Q_SLOTS:
   void updateBufferLength();
   void updateColorAndAlpha();

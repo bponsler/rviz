@@ -13,39 +13,39 @@ set(SOURCE_FILES
   # illuminance_display.cpp
   # image_display.cpp
   # interactive_marker_display.cpp
-  # interactive_markers/integer_action.cpp
-  # interactive_markers/interactive_marker_control.cpp
-  # interactive_markers/interactive_marker.cpp
+  interactive_markers/integer_action.cpp
+  interactive_markers/interactive_marker_control.cpp
+  interactive_markers/interactive_marker.cpp
   laser_scan_display.cpp
   map_display.cpp
-  # marker_array_display.cpp
-  # marker_display.cpp
-  # markers/arrow_marker.cpp
-  # markers/line_list_marker.cpp
-  # markers/line_strip_marker.cpp
-  # markers/marker_base.cpp
-  # markers/marker_selection_handler.cpp
-  # markers/mesh_resource_marker.cpp
-  # markers/points_marker.cpp
-  # markers/shape_marker.cpp
-  # markers/text_view_facing_marker.cpp
-  # markers/triangle_list_marker.cpp
-  # odometry_display.cpp
-  # path_display.cpp
-  # point_display.cpp
-  # point_visual.cpp
+  marker_array_display.cpp
+  marker_display.cpp
+  markers/arrow_marker.cpp
+  markers/line_list_marker.cpp
+  markers/line_strip_marker.cpp
+  markers/marker_base.cpp
+  markers/marker_selection_handler.cpp
+  markers/mesh_resource_marker.cpp
+  markers/points_marker.cpp
+  markers/shape_marker.cpp
+  markers/text_view_facing_marker.cpp
+  markers/triangle_list_marker.cpp
+  odometry_display.cpp
+  path_display.cpp
+  point_display.cpp
+  point_visual.cpp
   # point_cloud2_display.cpp
   point_cloud_common.cpp
   # point_cloud_display.cpp
   point_cloud_transformer.h
   point_cloud_transformers.cpp
-  # polygon_display.cpp
+  polygon_display.cpp
   # pose_array_display.cpp
-  # pose_display.cpp
-  # range_display.cpp
-  # relative_humidity_display.cpp
-  #robot_model_display.cpp
-  # temperature_display.cpp
+  pose_display.cpp
+  range_display.cpp
+  relative_humidity_display.cpp
+  robot_model_display.cpp
+  temperature_display.cpp
   tf_display.cpp
   tools/focus_tool.cpp
   tools/measure_tool.cpp
@@ -61,8 +61,8 @@ set(SOURCE_FILES
   view_controllers/third_person_follower_view_controller.cpp
   view_controllers/fixed_orientation_ortho_view_controller.cpp
   view_controllers/fps_view_controller.cpp
-  # wrench_display.cpp
-  # wrench_visual.cpp
+  wrench_display.cpp
+  wrench_visual.cpp
   ${MOC_FILES}
 )
 

@@ -55,6 +55,17 @@ Arrow::Arrow( Ogre::SceneManager* scene_manager, Ogre::SceneNode* parent_node, f
   head_ = new Shape( Shape::Cone, scene_manager_, scene_node_ );
   head_->setOffset(Ogre::Vector3(0.0f, 0.5f, 0.0f));
 
+  ///////////////////////////////////////////////////////////////////////////////
+  // TODO: This is a giant hack for now. For some reason, if the cube shape is
+  // not loaded during the rviz startup process rviz will crash when it attempts
+  // to create a cube for the robot model. The following code will create one
+  // during start up, which prevents rviz from crashing when the robot model
+  // is updated later. This really needs to be figured out, but this
+  // works around the issue for now
+  Shape* cube_ = new Shape( Shape::Cube, scene_manager_, scene_node_ );
+  delete cube_;
+  ///////////////////////////////////////////////////////////////////////////////
+  
   set( shaft_length, shaft_diameter, head_length, head_diameter );
 
   setOrientation( Ogre::Quaternion::IDENTITY );

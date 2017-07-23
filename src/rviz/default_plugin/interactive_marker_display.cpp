@@ -69,7 +69,7 @@ InteractiveMarkerDisplay::InteractiveMarkerDisplay()
   : Display()
 {
   marker_update_topic_property_ = new RosTopicProperty( "Update Topic", "",
-                                                        ros::message_traits::datatype<visualization_msgs::msg::InteractiveMarkerUpdate>(),
+                                                        "visualization_msgs/InteractiveMarkerUpdate",
                                                         "visualization_msgs::msg::InteractiveMarkerUpdate topic to subscribe to.",
                                                         this, SLOT( updateTopic() ));
 
@@ -99,7 +99,7 @@ void InteractiveMarkerDisplay::onInitialize()
   im_client_->setResetCb( std::bind( &InteractiveMarkerDisplay::resetCb, this, std::placeholders::_1 ) );
   im_client_->setStatusCb( std::bind( &InteractiveMarkerDisplay::statusCb, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 ) );
 
-  client_id_ = ros::this_node::getName() + "/" + getNameStd();
+  client_id_ = update_nh_->get_name() + "/" + getNameStd();
 
   onEnable();
 }
@@ -145,14 +145,15 @@ void InteractiveMarkerDisplay::subscribe()
     im_client_->subscribe(topic_ns_);
 
     std::string feedback_topic = topic_ns_+"/feedback";
-    feedback_pub_ = update_nh_.advertise<visualization_msgs::msg::InteractiveMarkerFeedback>( feedback_topic, 100, false );
+    feedback_pub_ = update_nh_->create_publisher<visualization_msgs::msg::InteractiveMarkerFeedback>(
+      feedback_topic, 100);
   }
 }
 
 void InteractiveMarkerDisplay::publishFeedback(visualization_msgs::msg::InteractiveMarkerFeedback &feedback)
 {
   feedback.client_id = client_id_;
-  feedback_pub_.publish( feedback );
+  feedback_pub_->publish( feedback );
 }
 
 void InteractiveMarkerDisplay::onStatusUpdate( StatusProperty::Level level, const std::string& name, const std::string& text )
@@ -166,7 +167,7 @@ void InteractiveMarkerDisplay::unsubscribe()
   {
     im_client_->shutdown();
   }
-  feedback_pub_.shutdown();
+  feedback_pub_->reset();
   Display::reset();
 }
 

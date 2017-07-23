@@ -540,18 +540,17 @@ void RobotLink::createEntityForGeometryElement(const urdf::LinkConstPtr& link, c
   case urdf::Geometry::SPHERE:
   {
     const urdf::Sphere& sphere = static_cast<const urdf::Sphere&>(geom);
-    entity = Shape::createEntity(entity_name, Shape::Sphere, scene_manager_);
 
+    entity = Shape::createEntity(entity_name, Shape::Sphere, scene_manager_);
     scale = Ogre::Vector3( sphere.radius*2, sphere.radius*2, sphere.radius*2 );
     break;
   }
   case urdf::Geometry::BOX:
   {
     const urdf::Box& box = static_cast<const urdf::Box&>(geom);
+
     entity = Shape::createEntity(entity_name, Shape::Cube, scene_manager_);
-
     scale = Ogre::Vector3( box.dim.x, box.dim.y, box.dim.z );
-
     break;
   }
   case urdf::Geometry::CYLINDER:

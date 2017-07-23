@@ -55,8 +55,8 @@ ShapeMarker::~ShapeMarker()
   delete shape_;
 }
 
-void ShapeMarker::onNewMessage( const MarkerConstPtr& old_message,
-    const MarkerConstPtr& new_message )
+void ShapeMarker::onNewMessage( const MarkerPtr& old_message,
+    const MarkerPtr& new_message )
 {
   if (!shape_ || old_message->type != new_message->type)
   {
@@ -66,9 +66,9 @@ void ShapeMarker::onNewMessage( const MarkerConstPtr& old_message,
     Shape::Type shape_type = Shape::Cube;
     switch( new_message->type )
     {
-    case visualization_msgs::Marker::CUBE:     shape_type = Shape::Cube;     break;
-    case visualization_msgs::Marker::CYLINDER: shape_type = Shape::Cylinder; break;
-    case visualization_msgs::Marker::SPHERE:   shape_type = Shape::Sphere;   break;
+    case visualization_msgs::msg::Marker::CUBE:     shape_type = Shape::Cube;     break;
+    case visualization_msgs::msg::Marker::CYLINDER: shape_type = Shape::Cylinder; break;
+    case visualization_msgs::msg::Marker::SPHERE:   shape_type = Shape::Sphere;   break;
     default:
       ROS_BREAK();
       break;

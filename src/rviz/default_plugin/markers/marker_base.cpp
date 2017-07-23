@@ -34,14 +34,13 @@
 #include "marker_selection_handler.h"
 #include "rviz/frame_manager.h"
 
+#include <ros2_console/assert.hpp>
+
 #include <OgreSceneNode.h>
 #include <OgreSceneManager.h>
 #include <OgreEntity.h>
 #include <OgreSubEntity.h>
 #include <OgreSharedPtr.h>
-
-#include <tf/tf.h>
-#include <tf/transform_listener.h>
 
 namespace rviz
 {
@@ -60,16 +59,20 @@ MarkerBase::~MarkerBase()
 void MarkerBase::setMessage(const Marker& message)
 {
   // copy and save to shared pointer
-  MarkerConstPtr message_ptr( new Marker(message) );
+  MarkerPtr message_ptr( new Marker(message) );
   setMessage( message_ptr );
 }
 
-void MarkerBase::setMessage(const MarkerConstPtr& message)
+void MarkerBase::setMessage(const MarkerPtr& message)
 {
-  MarkerConstPtr old = message_;
+  MarkerPtr old = message_;
   message_ = message;
 
-  expiration_ = ros::Time::now() + message->lifetime;
+  tf2::Duration lifetime = std::chrono::duration_cast<tf2::Duration>(
+    std::chrono::seconds(message->lifetime.sec) +
+    std::chrono::nanoseconds(message->lifetime.nanosec));
+  
+  expiration_ = tf2::get_now() + lifetime;
 
   onNewMessage(old, message);
 }
@@ -82,21 +85,22 @@ void MarkerBase::updateFrameLocked()
 
 bool MarkerBase::expired()
 {
-  return ros::Time::now() >= expiration_;
+  return tf2::get_now() >= expiration_;
 }
 
-bool MarkerBase::transform(const MarkerConstPtr& message, Ogre::Vector3& pos, Ogre::Quaternion& orient, Ogre::Vector3& scale)
+bool MarkerBase::transform(const MarkerPtr& message, Ogre::Vector3& pos, Ogre::Quaternion& orient, Ogre::Vector3& scale)
 {
-  ros::Time stamp = message->header.stamp;
+  tf2::TimePoint stamp = tf2_ros::fromMsg(message->header.stamp);
   if (message->frame_locked)
   {
-    stamp = ros::Time();
+    stamp = tf2::TimePointZero;
   }
 
   if (!context_->getFrameManager()->transform(message->header.frame_id, stamp, message->pose, pos, orient))
   {
     std::string error;
-    context_->getFrameManager()->transformHasProblems(message->header.frame_id, message->header.stamp, error);
+    context_->getFrameManager()->transformHasProblems(
+      message->header.frame_id, tf2_ros::fromMsg(message->header.stamp), error);
     if ( owner_ )
     {
       owner_->setMarkerStatus(getID(), StatusProperty::Error, error);

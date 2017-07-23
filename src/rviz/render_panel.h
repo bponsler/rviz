@@ -35,7 +35,7 @@
 #ifndef Q_MOC_RUN
 #include <OgreSceneManager.h>
 
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 #endif
 
 #include <vector>
@@ -93,7 +93,7 @@ public:
 
   /** Show the given menu as a context menu, positioned based on the
    * current mouse position.  This can be called from any thread. */
-  void showContextMenu( boost::shared_ptr<QMenu> menu );
+  void showContextMenu( std::shared_ptr<QMenu> menu );
 
   /** Return true if the context menu for this panel is visible */
   bool contextMenuVisible();
@@ -130,8 +130,8 @@ protected:
 
   ViewController* view_controller_;
 
-  boost::shared_ptr<QMenu> context_menu_;
-  boost::mutex context_menu_mutex_;
+  std::shared_ptr<QMenu> context_menu_;
+  std::mutex context_menu_mutex_;
 
   bool context_menu_visible_;
 

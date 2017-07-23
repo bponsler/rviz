@@ -4,7 +4,6 @@ if(NEW_YAMLCPP_FOUND)
   add_definitions(-DRVIZ_HAVE_YAMLCPP_05)
 endif(NEW_YAMLCPP_FOUND)
 
-# TODO: disabled default plugins for now
 add_subdirectory(default_plugin)
 
 include_directories(.)

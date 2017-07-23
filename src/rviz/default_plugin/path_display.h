@@ -31,7 +31,7 @@
 #ifndef RVIZ_PATH_DISPLAY_H
 #define RVIZ_PATH_DISPLAY_H
 
-#include <nav_msgs/Path.h>
+#include <nav_msgs/msg/path.hpp>
 
 #include "rviz/message_filter_display.h"
 
@@ -53,9 +53,9 @@ class VectorProperty;
 
 /**
  * \class PathDisplay
- * \brief Displays a nav_msgs::Path message
+ * \brief Displays a nav_msgs::msg::Path message
  */
-class PathDisplay: public MessageFilterDisplay<nav_msgs::Path>
+class PathDisplay: public MessageFilterDisplay<nav_msgs::msg::Path>
 {
 Q_OBJECT
 public:
@@ -70,8 +70,14 @@ protected:
   virtual void onInitialize();
 
   /** @brief Overridden from MessageFilterDisplay. */
-  void processMessage( const nav_msgs::Path::ConstPtr& msg );
+  void processMessage( const nav_msgs::msg::Path::SharedPtr msg );
 
+  /** @brief Get the frame for the given message. */
+  virtual std::string getMsgFrame(const nav_msgs::msg::Path::SharedPtr msg);
+
+  /** @brief Get the time stamp for the given message. */
+  virtual tf2::TimePoint getMsgTime(const nav_msgs::msg::Path::SharedPtr msg);
+  
 private Q_SLOTS:
   void updateBufferLength();
   void updateStyle();

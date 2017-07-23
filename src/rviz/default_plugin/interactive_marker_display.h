@@ -38,8 +38,6 @@
 #include <visualization_msgs/InteractiveMarkerInit.h>
 
 #ifndef Q_MOC_RUN
-#include <message_filters/subscriber.h>
-#include <tf2_ros/message_filter.h>
 #include <interactive_markers/interactive_marker_client.h>
 #endif
 
@@ -55,7 +53,7 @@ class Object;
 class RosTopicProperty;
 class MarkerBase;
 
-typedef boost::shared_ptr<MarkerBase> MarkerBasePtr;
+typedef std::shared_ptr<MarkerBase> MarkerBasePtr;
 typedef std::pair<std::string, int32_t> MarkerID;
 
 /**
@@ -88,7 +86,7 @@ protected Q_SLOTS:
   void updateShowAxes();
   void updateShowVisualAids();
   void updateEnableTransparency();
-  void publishFeedback(visualization_msgs::InteractiveMarkerFeedback &feedback);
+  void publishFeedback(visualization_msgs::msg::InteractiveMarkerFeedback &feedback);
   void onStatusUpdate( StatusProperty::Level level, const std::string& name, const std::string& text );
 
 private:
@@ -99,8 +97,8 @@ private:
   // Unsubscribe from all message topics
   void unsubscribe();
 
-  void initCb( visualization_msgs::InteractiveMarkerInitConstPtr msg );
-  void updateCb( visualization_msgs::InteractiveMarkerUpdateConstPtr msg );
+  void initCb( visualization_msgs::msg::InteractiveMarkerInit::SharedPtr msg );
+  void updateCb( visualization_msgs::msg::InteractiveMarkerUpdate::SharedPtr msg );
 
   void resetCb( std::string server_id );
 
@@ -110,22 +108,22 @@ private:
 
   void updateMarkers(
       const std::string& server_id,
-      const std::vector<visualization_msgs::InteractiveMarker>& markers );
+      const std::vector<visualization_msgs::msg::InteractiveMarker>& markers );
 
   void updatePoses(
       const std::string& server_id,
-      const std::vector<visualization_msgs::InteractiveMarkerPose>& marker_poses );
+      const std::vector<visualization_msgs::msg::InteractiveMarkerPose>& marker_poses );
 
   void eraseMarkers(
       const std::string& server_id,
       const std::vector<std::string>& names );
 
   // Update the display's versions of the markers.
-  void processMarkerChanges( const std::vector<visualization_msgs::InteractiveMarker>* markers = NULL,
-                             const std::vector<visualization_msgs::InteractiveMarkerPose>* poses = NULL,
+  void processMarkerChanges( const std::vector<visualization_msgs::msg::InteractiveMarker>* markers = NULL,
+                             const std::vector<visualization_msgs::msg::InteractiveMarkerPose>* poses = NULL,
                              const std::vector<std::string>* erases = NULL );
 
-  typedef boost::shared_ptr<InteractiveMarker> IMPtr;
+  typedef std::shared_ptr<InteractiveMarker> IMPtr;
   typedef std::map< std::string, IMPtr > M_StringToIMPtr;
   typedef std::map< std::string, M_StringToIMPtr > M_StringToStringToIMPtr;
   M_StringToStringToIMPtr interactive_markers_;
@@ -141,9 +139,9 @@ private:
   BoolProperty* show_visual_aids_property_;
   BoolProperty* enable_transparency_property_;
 
-  boost::shared_ptr<interactive_markers::InteractiveMarkerClient> im_client_;
+  std::shared_ptr<interactive_markers::InteractiveMarkerClient> im_client_;
 
-  ros::Publisher feedback_pub_;
+  rclcpp::publisher::Publisher<visualization_msgs::msg::InteractiveMarkerFeedback> feedback_pub_;
 
   std::string topic_ns_;
 };

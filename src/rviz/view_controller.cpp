@@ -232,7 +232,7 @@ void ViewController::handleKeyEvent( QKeyEvent* event, RenderPanel* panel )
 
 void ViewController::setCursor( CursorType cursor_type )
 {
-  //cursor_=standard_cursors_[cursor_type];  // TODO: fix this
+  cursor_=standard_cursors_[cursor_type];
 }
 
 void ViewController::lookAt( float x, float y, float z )

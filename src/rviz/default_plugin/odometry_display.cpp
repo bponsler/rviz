@@ -27,9 +27,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-#include <tf/transform_listener.h>
-
 #include "rviz/frame_manager.h"
 #include "rviz/ogre_helpers/arrow.h"
 #include "rviz/properties/color_property.h"
@@ -49,7 +46,7 @@ OdometryDisplay::OdometryDisplay()
   , messages_received_(0)
 {
   topic_property_ = new RosTopicProperty( "Topic", "",
-                                          QString::fromStdString( ros::message_traits::datatype<nav_msgs::Odometry>() ),
+                                          QString::fromStdString( "nav_msgs/Odometry" ),
                                           "nav_msgs::Odometry topic to subscribe to.",
                                           this, SLOT( updateTopic() ));
 
@@ -85,18 +82,11 @@ OdometryDisplay::~OdometryDisplay()
   {
     unsubscribe();
     clear();
-    delete tf_filter_;
   }
 }
 
 void OdometryDisplay::onInitialize()
 {
-  tf_filter_ = new tf::MessageFilter<nav_msgs::Odometry>( *context_->getTFClient(), fixed_frame_.toStdString(),
-                                                          5, update_nh_ );
-
-  tf_filter_->connectInput( sub_ );
-  tf_filter_->registerCallback( std::bind( &OdometryDisplay::incomingMessage, this, std::placeholders::_1 ));
-  context_->getFrameManager()->registerFilterForTransformStatusCheck( tf_filter_, this );
 }
 
 void OdometryDisplay::clear()
@@ -113,8 +103,6 @@ void OdometryDisplay::clear()
   {
     last_used_message_.reset();
   }
-
-  tf_filter_->clear();
 
   messages_received_ = 0;
   setStatus( StatusProperty::Warn, "Topic", "No messages received" );
@@ -161,17 +149,20 @@ void OdometryDisplay::updateLength()
 
 void OdometryDisplay::subscribe()
 {
-  if ( !isEnabled() )
+  if ( !isEnabled() || topic_property_->getTopicStd().size() == 0 )
   {
     return;
   }
 
   try
   {
-    sub_.subscribe( update_nh_, topic_property_->getTopicStd(), 5 );
+    sub_ = update_nh_->create_subscription<nav_msgs::msg::Odometry>(
+      topic_property_->getTopicStd(),
+      5,
+      std::bind(&OdometryDisplay::incomingMessage, this, std::placeholders::_1));
     setStatus( StatusProperty::Ok, "Topic", "OK" );
   }
-  catch( ros::Exception& e )
+  catch( rclcpp::exceptions::RCLError& e )
   {
     setStatus( StatusProperty::Error, "Topic", QString( "Error subscribing: " ) + e.what() );
   }
@@ -179,7 +170,7 @@ void OdometryDisplay::subscribe()
 
 void OdometryDisplay::unsubscribe()
 {
-  sub_.unsubscribe();
+  sub_.reset();
 }
 
 void OdometryDisplay::onEnable()
@@ -193,7 +184,7 @@ void OdometryDisplay::onDisable()
   clear();
 }
 
-bool validateFloats(const nav_msgs::Odometry& msg)
+bool validateFloats(const nav_msgs::msg::Odometry& msg)
 {
   bool valid = true;
   valid = valid && validateFloats( msg.pose.pose );
@@ -201,8 +192,18 @@ bool validateFloats(const nav_msgs::Odometry& msg)
   return valid;
 }
 
-void OdometryDisplay::incomingMessage( const nav_msgs::Odometry::ConstPtr& message )
+void OdometryDisplay::incomingMessage( const nav_msgs::msg::Odometry::SharedPtr message )
 {
+  // Skip any messages that can not be transformed to the fixed frame
+  tf2_ros::Buffer* buffer = context_->getFrameManager()->getTFBuffer();
+  if (!buffer->canTransform(fixed_frame_.toStdString(),
+			    message->header.frame_id,
+			    tf2_ros::fromMsg(message->header.stamp),
+			    tf2::durationFromSec(0.1)))
+  {
+    return;
+  }
+  
   ++messages_received_;
 
   if( !validateFloats( *message ))
@@ -244,7 +245,7 @@ void OdometryDisplay::incomingMessage( const nav_msgs::Odometry::ConstPtr& messa
   context_->queueRender();
 }
 
-void OdometryDisplay::transformArrow( const nav_msgs::Odometry::ConstPtr& message, Arrow* arrow )
+void OdometryDisplay::transformArrow( const nav_msgs::msg::Odometry::SharedPtr message, Arrow* arrow )
 {
   Ogre::Vector3 position;
   Ogre::Quaternion orientation;
@@ -263,7 +264,6 @@ void OdometryDisplay::transformArrow( const nav_msgs::Odometry::ConstPtr& messag
 
 void OdometryDisplay::fixedFrameChanged()
 {
-  tf_filter_->setTargetFrame( fixed_frame_.toStdString() );
   clear();
 }
 

@@ -422,7 +422,7 @@ tf2_ros::Buffer* VisualizationManager::getTFBuffer() const
 void VisualizationManager::resetTime()
 {
   root_display_group_->reset();
-  //frame_manager_->getTFClient()->clear();  // TODO: clear tf
+  frame_manager_->getTFBuffer()->clear();
 
   ros_time_begin_ = tf2::TimePointZero;
   wall_clock_begin_ = tf2::TimePointZero;

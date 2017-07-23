@@ -35,6 +35,7 @@
 
 #ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
 # include <rclcpp/rclcpp.hpp>
+#include <ros2_console/console.hpp>
 #endif
 
 #include "rviz/properties/status_property.h"

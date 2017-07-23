@@ -43,7 +43,7 @@
 
 #include <QCursor>
 
-#include <visualization_msgs/InteractiveMarkerControl.h>
+#include <visualization_msgs/msg/interactive_marker_control.hpp>
 
 #include "rviz/default_plugin/markers/marker_base.h"
 #include "rviz/selection/forwards.h"
@@ -74,7 +74,7 @@ public:
    *
    * Just creates Ogre::SceneNodes and sets some defaults.  To
    * actually make it look like a
-   * visualization_msgs::InteractiveMarkerControl message specifies,
+   * visualization_msgs::msg::InteractiveMarkerControl message specifies,
    * call processMessage().
    */
   InteractiveMarkerControl( DisplayContext* context,
@@ -85,7 +85,7 @@ public:
 
   /** @brief Set up or update the contents of this control to match the
    *         specification in the message. */
-  void processMessage( const visualization_msgs::InteractiveMarkerControl &message );
+  void processMessage( const visualization_msgs::msg::InteractiveMarkerControl &message );
 
   // called when interactive mode is globally switched on/off
   virtual void enableInteraction(bool enable);
@@ -127,7 +127,7 @@ public:
    * function on all its child controls. */
   void interactiveMarkerPoseChanged( Ogre::Vector3 int_marker_position, Ogre::Quaternion int_marker_orientation );
 
-  bool isInteractive() { return interaction_mode_ != visualization_msgs::InteractiveMarkerControl::NONE; }
+  bool isInteractive() { return interaction_mode_ != visualization_msgs::msg::InteractiveMarkerControl::NONE; }
 
   // Called every frame by parent's update() function.
   void update();
@@ -160,12 +160,12 @@ public:
   const QString& getDescription() { return description_; }
 
   /**
-   * @return the visualization_msgs::InteractiveMarkerControl interaction_mode for this control
+   * @return the visualization_msgs::msg::InteractiveMarkerControl interaction_mode for this control
    */
   int getInteractionMode() { return interaction_mode_; }
 
   /**
-   * @return the visualization_msgs::InteractiveMarkerControl orientation_mode for this control
+   * @return the visualization_msgs::msg::InteractiveMarkerControl orientation_mode for this control
    */
   int getOrientationMode() { return orientation_mode_; }
 
@@ -300,7 +300,7 @@ protected:
                                            const Ogre::Vector3& test_point );
 
   /** @brief Create marker objects from the message and add them to the internal marker arrays. */
-  void makeMarkers( const visualization_msgs::InteractiveMarkerControl &message );
+  void makeMarkers( const visualization_msgs::msg::InteractiveMarkerControl &message );
 
   void stopDragging( bool force = false );
 

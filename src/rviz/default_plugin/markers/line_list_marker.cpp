@@ -52,9 +52,9 @@ LineListMarker::~LineListMarker()
   delete lines_;
 }
 
-void LineListMarker::onNewMessage(const MarkerConstPtr& old_message, const MarkerConstPtr& new_message)
+void LineListMarker::onNewMessage(const MarkerPtr& old_message, const MarkerPtr& new_message)
 {
-  ROS_ASSERT(new_message->type == visualization_msgs::Marker::LINE_LIST);
+  ROS_ASSERT(new_message->type == visualization_msgs::msg::Marker::LINE_LIST);
 
   if (!lines_)
   {
@@ -102,7 +102,7 @@ void LineListMarker::onNewMessage(const MarkerConstPtr& old_message, const Marke
         Ogre::ColourValue c;
         if (has_per_point_color)
         {
-          const std_msgs::ColorRGBA& color = new_message->colors[i];
+          const std_msgs::msg::ColorRGBA& color = new_message->colors[i];
           c.r = color.r;
           c.g = color.g;
           c.b = color.b;

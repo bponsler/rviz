@@ -44,6 +44,7 @@
 namespace rviz
 {
 RangeDisplay::RangeDisplay()
+  : MessageFilterDisplay("sensor_msgs/Range")
 {
   color_property_ = new ColorProperty( "Color", Qt::white,
                                        "Color to draw the range.",
@@ -86,7 +87,7 @@ void RangeDisplay::reset()
 
 void RangeDisplay::updateQueueSize()
 {
-  tf_filter_->setQueueSize( (uint32_t) queue_size_property_->getInt() );
+  // TODO: set queue size
 }
 
 void RangeDisplay::updateColorAndAlpha()
@@ -125,7 +126,7 @@ void RangeDisplay::updateBufferLength()
   }
 }
 
-void RangeDisplay::processMessage( const sensor_msgs::Range::ConstPtr& msg )
+void RangeDisplay::processMessage( const sensor_msgs::msg::Range::SharedPtr msg )
 {
   Shape* cone = cones_[ messages_received_ % buffer_length_property_->getInt() ];
 
@@ -144,7 +145,7 @@ void RangeDisplay::processMessage( const sensor_msgs::Range::ConstPtr& msg )
   pose.position.x = displayed_range/2 - .008824 * displayed_range; // .008824 fudge factor measured, must be inaccuracy of cone model.
   pose.orientation.z = 0.707;
   pose.orientation.w = 0.707;
-  if( !context_->getFrameManager()->transform( msg->header.frame_id, msg->header.stamp, pose, position, orientation ))
+  if( !context_->getFrameManager()->transform( msg->header.frame_id, getMsgTime(msg), pose, position, orientation ))
   {
     ROS_DEBUG( "Error transforming from frame '%s' to frame '%s'",
                msg->header.frame_id.c_str(), qPrintable( fixed_frame_ ));
@@ -161,6 +162,16 @@ void RangeDisplay::processMessage( const sensor_msgs::Range::ConstPtr& msg )
   cone->setColor( color.redF(), color.greenF(), color.blueF(), alpha_property_->getFloat() );
 }
 
+std::string RangeDisplay::getMsgFrame(const sensor_msgs::msg::Range::SharedPtr msg)
+{
+  return msg->header.frame_id;
+}
+
+tf2::TimePoint RangeDisplay::getMsgTime(const sensor_msgs::msg::Range::SharedPtr msg)
+{
+  return tf2_ros::fromMsg(msg->header.stamp);
+}
+  
 } // namespace rviz
 
 #include <pluginlib/class_list_macros.h>

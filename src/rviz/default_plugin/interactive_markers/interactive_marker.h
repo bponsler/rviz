@@ -31,21 +31,16 @@
 #define RVIZ_INTERACTIVE_MARKER_H_
 
 #ifndef Q_MOC_RUN
-#include <boost/shared_ptr.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/recursive_mutex.hpp>
-#include <boost/thread/thread.hpp>
+#include <mutex>
 
 #include <OgreVector3.h>
 #include <OgreQuaternion.h>
 #endif
 
-#include <visualization_msgs/InteractiveMarker.h>
-#include <visualization_msgs/InteractiveMarkerPose.h>
-#include <visualization_msgs/InteractiveMarkerFeedback.h>
+#include <visualization_msgs/msg/interactive_marker.hpp>
+#include <visualization_msgs/msg/interactive_marker_pose.hpp>
+#include <visualization_msgs/msg/interactive_marker_feedback.hpp>
 #include <geometry_msgs/msg/pose.hpp>
-
-#include <ros/publisher.h>
 
 #include "rviz/selection/forwards.h"
 #include "rviz/ogre_helpers/axes.h"
@@ -73,11 +68,11 @@ public:
 
   // reset contents to reflect the data from a new message
   // @return success
-  bool processMessage( const visualization_msgs::InteractiveMarker& message );
+  bool processMessage( const visualization_msgs::msg::InteractiveMarker& message );
 
   // reset contents to reflect the data from a new message
   // @return success
-  void processMessage( const visualization_msgs::InteractiveMarkerPose& message );
+  void processMessage( const visualization_msgs::msg::InteractiveMarkerPose& message );
 
   // called every frame update
   void update(float wall_dt);
@@ -137,18 +132,18 @@ public:
   void showMenu( ViewportMouseEvent& event, const std::string &control_name, const Ogre::Vector3 &three_d_point, bool valid_point );
 
   // fill in current marker pose & name, publish
-  void publishFeedback(visualization_msgs::InteractiveMarkerFeedback &feedback,
+  void publishFeedback(visualization_msgs::msg::InteractiveMarkerFeedback &feedback,
                        bool mouse_point_valid = false,
                        const Ogre::Vector3& mouse_point_rel_world = Ogre::Vector3(0,0,0) );
 
   bool hasMenu() { return has_menu_; }
 
   /** @return A shared_ptr to the QMenu owned by this InteractiveMarker. */
-  boost::shared_ptr<QMenu> getMenu() { return menu_; }
+  std::shared_ptr<QMenu> getMenu() { return menu_; }
 
 Q_SIGNALS:
 
-void userFeedback(visualization_msgs::InteractiveMarkerFeedback &feedback);
+void userFeedback(visualization_msgs::msg::InteractiveMarkerFeedback &feedback);
 void statusUpdate( StatusProperty::Level level, const std::string& name, const std::string& text );
 
 protected Q_SLOTS:
@@ -174,7 +169,7 @@ protected:
 
   // pose of parent coordinate frame
   std::string reference_frame_;
-  ros::Time reference_time_;
+  tf2::TimePoint reference_time_;
   bool frame_locked_;
 
   // node representing reference frame in tf, like /map, /base_link, /head, etc.
@@ -188,7 +183,7 @@ protected:
   bool pose_changed_;
   double time_since_last_feedback_;
 
-  typedef boost::shared_ptr<InteractiveMarkerControl> InteractiveMarkerControlPtr;
+  typedef std::shared_ptr<InteractiveMarkerControl> InteractiveMarkerControlPtr;
   typedef std::map<std::string, InteractiveMarkerControlPtr> M_ControlPtr;
   M_ControlPtr controls_;
 
@@ -204,13 +199,13 @@ protected:
 
   float scale_;
 
-  boost::shared_ptr<QMenu> menu_;
+  std::shared_ptr<QMenu> menu_;
   bool has_menu_;
 
   // Helper to more simply represent the menu tree.
   struct MenuNode
   {
-    visualization_msgs::MenuEntry entry;
+    visualization_msgs::msg::MenuEntry entry;
     std::vector<uint32_t> child_ids;
   };
 
@@ -234,9 +229,9 @@ protected:
   std::string topic_ns_;
   std::string client_id_;
 
-  boost::recursive_mutex mutex_;
+  std::recursive_mutex mutex_;
 
-  boost::shared_ptr< boost::thread > sys_thread_;
+  std::shared_ptr< std::thread > sys_thread_;
 
   bool got_3d_point_for_menu_;
   Ogre::Vector3 three_d_point_for_menu_;

@@ -44,6 +44,8 @@
 
 # include <pluginlib/class_loader.h>
 
+# include <tf2/time.h>
+
 # include <sensor_msgs/msg/point_cloud.hpp>
 # include <sensor_msgs/msg/point_cloud2.hpp>
 

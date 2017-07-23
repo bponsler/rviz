@@ -67,6 +67,12 @@ protected:
   /** @brief Overridden from MessageFilterDisplay. */
   virtual void processMessage( const geometry_msgs::msg::PolygonStamped::SharedPtr msg );
 
+  /** @brief Get the frame for the given message. */
+  virtual std::string getMsgFrame(const geometry_msgs::msg::PolygonStamped::SharedPtr msg);
+
+  /** @brief Get the time stamp for the given message. */
+  virtual tf2::TimePoint getMsgTime(const geometry_msgs::msg::PolygonStamped::SharedPtr msg);
+  
   Ogre::ManualObject* manual_object_;
 
   ColorProperty* color_property_;

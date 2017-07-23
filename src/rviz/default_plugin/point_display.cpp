@@ -16,6 +16,7 @@ namespace rviz
 {
 
     PointStampedDisplay::PointStampedDisplay()
+      : MessageFilterDisplay("geometry_msgs/PointStamped")
     {
 	color_property_ =
 	    new rviz::ColorProperty( "Color", QColor(204, 41, 204),
@@ -93,7 +94,7 @@ namespace rviz
         Ogre::Quaternion orientation;
         Ogre::Vector3 position;
         if( !context_->getFrameManager()->getTransform( msg->header.frame_id,
-                                                        msg->header.stamp,
+                                                        tf2_ros::fromMsg(msg->header.stamp),
                                                         position, orientation ))
         {
 	    ROS_DEBUG( "Error transforming from frame '%s' to frame '%s'",
@@ -103,7 +104,7 @@ namespace rviz
 
         // We are keeping a circular buffer of visual pointers.  This gets
         // the next one, or creates and stores it if the buffer is not full
-        boost::shared_ptr<PointStampedVisual> visual;
+        std::shared_ptr<PointStampedVisual> visual;
         if( visuals_.full() )
             {
                 visual = visuals_.front();
@@ -129,6 +130,16 @@ namespace rviz
         visuals_.push_back(visual);
     }
 
+    std::string PointStampedDisplay::getMsgFrame(const geometry_msgs::msg::PointStamped::SharedPtr msg)
+    {
+      return msg->header.frame_id;
+    }
+
+    tf2::TimePoint PointStampedDisplay::getMsgTime(const geometry_msgs::msg::PointStamped::SharedPtr msg)
+    {
+      return tf2_ros::fromMsg(msg->header.stamp);
+    }
+  
 } // end namespace rviz
 
 // Tell pluginlib about this class.  It is important to do this in

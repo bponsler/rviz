@@ -186,9 +186,9 @@ void RenderPanel::setViewController( ViewController* controller )
   }
 }
 
-void RenderPanel::showContextMenu( boost::shared_ptr<QMenu> menu )
+void RenderPanel::showContextMenu( std::shared_ptr<QMenu> menu )
 {
-  boost::mutex::scoped_lock lock(context_menu_mutex_);
+  std::lock_guard<std::mutex> lock(context_menu_mutex_);
   context_menu_ = menu;
   context_menu_visible_ = true;
 
@@ -207,9 +207,9 @@ bool RenderPanel::contextMenuVisible()
 
 void RenderPanel::contextMenuEvent( QContextMenuEvent* event )
 {
-  boost::shared_ptr<QMenu> context_menu;
+  std::shared_ptr<QMenu> context_menu;
   {
-    boost::mutex::scoped_lock lock(context_menu_mutex_);
+    std::lock_guard<std::mutex> lock(context_menu_mutex_);
     context_menu.swap(context_menu_);
   }
 

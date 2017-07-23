@@ -19,6 +19,7 @@ namespace rviz
 {
 
 WrenchStampedDisplay::WrenchStampedDisplay()
+  : MessageFilterDisplay("geometry_msgs/WrenchStamped")
 {
     force_color_property_ =
             new rviz::ColorProperty( "Force Color", QColor( 204, 51, 51 ),
@@ -122,7 +123,7 @@ void WrenchStampedDisplay::processMessage( const geometry_msgs::msg::WrenchStamp
     Ogre::Quaternion orientation;
     Ogre::Vector3 position;
     if( !context_->getFrameManager()->getTransform( msg->header.frame_id,
-                                                    msg->header.stamp,
+                                                    getMsgTime(msg),
                                                     position, orientation ))
     {
         ROS_DEBUG( "Error transforming from frame '%s' to frame '%s'",
@@ -138,7 +139,7 @@ void WrenchStampedDisplay::processMessage( const geometry_msgs::msg::WrenchStamp
 
     // We are keeping a circular buffer of visual pointers.  This gets
     // the next one, or creates and stores it if the buffer is not full
-    boost::shared_ptr<WrenchVisual> visual;
+    std::shared_ptr<WrenchVisual> visual;
     if( visuals_.full() )
     {
         visual = visuals_.front();
@@ -168,6 +169,16 @@ void WrenchStampedDisplay::processMessage( const geometry_msgs::msg::WrenchStamp
     visuals_.push_back(visual);
 }
 
+std::string WrenchStampedDisplay::getMsgFrame(const geometry_msgs::msg::WrenchStamped::SharedPtr msg)
+{
+  return msg->header.frame_id;
+}
+
+tf2::TimePoint WrenchStampedDisplay::getMsgTime(const geometry_msgs::msg::WrenchStamped::SharedPtr msg)
+{
+  return tf2_ros::fromMsg(msg->header.stamp);
+}
+  
 } // end namespace rviz
 
 // Tell pluginlib about this class.  It is important to do this in

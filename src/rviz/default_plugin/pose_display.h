@@ -31,8 +31,6 @@
 #ifndef RVIZ_POSE_DISPLAY_H_
 #define RVIZ_POSE_DISPLAY_H_
 
-#include <boost/shared_ptr.hpp>
-
 #include <geometry_msgs/msg/pose_stamped.hpp>
 
 #include "rviz/message_filter_display.h"
@@ -48,7 +46,7 @@ class FloatProperty;
 class Shape;
 
 class PoseDisplaySelectionHandler;
-typedef boost::shared_ptr<PoseDisplaySelectionHandler> PoseDisplaySelectionHandlerPtr;
+typedef std::shared_ptr<PoseDisplaySelectionHandler> PoseDisplaySelectionHandlerPtr;
 
 /** @brief Accumulates and displays the pose from a geometry_msgs::msg::PoseStamped message. */
 class PoseDisplay: public MessageFilterDisplay<geometry_msgs::msg::PoseStamped>
@@ -71,6 +69,12 @@ protected:
   /** @brief Overridden from MessageFilterDisplay to get arrow/axes visibility correct. */
   virtual void onEnable();
 
+  /** @brief Get the frame for the given message. */
+  virtual std::string getMsgFrame(const geometry_msgs::msg::PoseStamped::SharedPtr msg);
+
+  /** @brief Get the time stamp for the given message. */
+  virtual tf2::TimePoint getMsgTime(const geometry_msgs::msg::PoseStamped::SharedPtr msg);
+  
 private Q_SLOTS:
   void updateShapeVisibility();
   void updateColorAndAlpha();

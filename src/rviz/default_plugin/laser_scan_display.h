@@ -69,10 +69,10 @@ protected:
   virtual void processMessage( const sensor_msgs::msg::LaserScan::SharedPtr scan );
 
   /** @brief Get the frame for the given message. */
-  virtual std::string getMsgFrame(const typename sensor_msgs::msg::LaserScan::SharedPtr msg);
+  virtual std::string getMsgFrame(const sensor_msgs::msg::LaserScan::SharedPtr msg);
 
   /** @brief Get the time stamp for the given message. */
-  virtual tf2::TimePoint getMsgTime(const typename sensor_msgs::msg::LaserScan::SharedPtr msg);
+  virtual tf2::TimePoint getMsgTime(const sensor_msgs::msg::LaserScan::SharedPtr msg);
 
   IntProperty* queue_size_property_;
 

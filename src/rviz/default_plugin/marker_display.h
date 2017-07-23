@@ -32,17 +32,17 @@
 
 #include <map>
 #include <set>
-
-#include <boost/thread/mutex.hpp>
-#include <boost/shared_ptr.hpp>
+#include <mutex>
 
 #ifndef Q_MOC_RUN
-#include <tf2_ros/message_filter.h>
-#include <message_filters/subscriber.h>
+#include <tf2/time.h>
+#include <tf2_ros/buffer.h>
 #endif
 
 #include <visualization_msgs/msg/marker.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
+
+#include <rclcpp/rclcpp.hpp>
 
 #include "rviz/display.h"
 #include "rviz/properties/bool_property.h"
@@ -57,8 +57,8 @@ class MarkerSelectionHandler;
 class Object;
 class RosTopicProperty;
 
-typedef boost::shared_ptr<MarkerSelectionHandler> MarkerSelectionHandlerPtr;
-typedef boost::shared_ptr<MarkerBase> MarkerBasePtr;
+typedef std::shared_ptr<MarkerSelectionHandler> MarkerSelectionHandlerPtr;
+typedef std::shared_ptr<MarkerBase> MarkerBasePtr;
 typedef std::pair<std::string, int32_t> MarkerID;
 
 /**
@@ -108,7 +108,7 @@ protected:
   /** @brief Process a MarkerArray message. */
   void incomingMarkerArray( const visualization_msgs::msg::MarkerArray::SharedPtr array );
 
-  ros::Subscriber array_sub_;
+  rclcpp::subscription::Subscription<visualization_msgs::msg::MarkerArray>::SharedPtr array_sub_;
 
   RosTopicProperty* marker_topic_property_;
   IntProperty* queue_size_property_;
@@ -147,7 +147,8 @@ private:
    */
   void incomingMarker(const visualization_msgs::msg::Marker::SharedPtr marker);
 
-  void failedMarker(const ros::MessageEvent<visualization_msgs::msg::Marker>& marker_evt, tf::FilterFailureReason reason);
+  // TODO: fix failed marker function
+  //void failedMarker(const ros::MessageEvent<visualization_msgs::msg::Marker>& marker_evt, tf2::FilterFailureReason reason);
 
   typedef std::map<MarkerID, MarkerBasePtr> M_IDToMarker;
   typedef std::set<MarkerBasePtr> S_MarkerBase;
@@ -157,10 +158,11 @@ private:
   typedef std::vector<visualization_msgs::msg::Marker::SharedPtr> V_MarkerMessage;
   V_MarkerMessage message_queue_;                       ///< Marker message queue.  Messages are added to this as they are received, and then processed
                                                         ///< in our update() function
-  boost::mutex queue_mutex_;
+  std::mutex queue_mutex_;
 
-  message_filters::Subscriber<visualization_msgs::msg::Marker> sub_;
-  tf::MessageFilter<visualization_msgs::msg::Marker>* tf_filter_;
+  // TODO: create subscription
+  //message_filters::Subscriber<visualization_msgs::msg::Marker> sub_;
+  //tf::MessageFilter<visualization_msgs::msg::Marker>* tf_filter_;
 
   typedef QHash<QString, MarkerNamespace*> M_Namespace;
   M_Namespace namespaces_;
