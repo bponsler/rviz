@@ -17,7 +17,7 @@
   <url type="repository">https://github.com/ros-visualization/rviz</url>
   <url type="bugtracker">https://github.com/ros-visualization/rviz/issues</url>
 
-  <buildtool_depend>ament</buildtool_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
 
   <build_depend>assimp-dev</build_depend>
   <build_depend>cmake_modules</build_depend>
