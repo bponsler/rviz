@@ -34,7 +34,7 @@
 #include <QTreeWidget>
 #include <QComboBox>
 
-#include <boost/shared_ptr.hpp>
+#include <ros2_daemon_client_cpp/Ros2DaemonClient.hpp>
 
 #include "rviz/factory.h"
 
@@ -197,6 +197,9 @@ private:
   // Map from ROS topic type to all displays that can visualize it.
   // One key may have multiple values.
   QMap<QString, QString > datatype_plugins_;
+  
+  /** Client to the ROS 2 daemon */
+  ros2_daemon_client_cpp::Ros2DaemonClient daemon_client_;
 };
 
 /** A combo box that can be inserted into a QTreeWidgetItem

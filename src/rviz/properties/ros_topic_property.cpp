@@ -32,6 +32,9 @@
 #include <QApplication>
 
 
+using namespace ros2_daemon_client_cpp;
+
+
 namespace rviz
 {
 
@@ -61,24 +64,21 @@ void RosTopicProperty::fillTopicList()
 
   std::string std_message_type = message_type_.toStdString();
 
-  // TODO: need some way to get list of topics
-  /*
-  ros::master::V_TopicInfo topics;
-  ros::master::getTopics( topics );
+  // Grab the list of topics
+  TopicDataVector topics = daemon_client_.getTopics();
 
   // Loop through all published topics
-  ros::master::V_TopicInfo::iterator it;
+  TopicDataVector::const_iterator it;
   for( it = topics.begin(); it != topics.end(); ++it )
   {
-    const ros::master::TopicInfo& topic = *it;
+    const TopicData& data = *it;
 
     // Only add topics whose type matches.
-    if( topic.datatype == std_message_type )
+    if( data.type == std_message_type )
     {
-      addOptionStd( topic.name );
+      addOptionStd( data.topic );
     }
   }
-  */
   
   sortOptions();
   QApplication::restoreOverrideCursor();

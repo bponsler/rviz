@@ -50,26 +50,19 @@
 
 #include "display_factory.h"
 
+
+using namespace ros2_daemon_client_cpp;
+
+
 namespace rviz
 {
 
-// TODO: Until there's a C++ library for this
-struct TopicInfo {
-  std::string name;
-  std::string datatype;
-};
-typedef std::vector<TopicInfo> V_TopicInfo;
-
-void getTopics( V_TopicInfo & topics )
-{ 
-  // TODO: need a way to get a list of ROS 2 topics and datatypes
-}
   
 // Utilities for grouping topics together
 
 struct LexicalTopicInfo {
-  bool operator()(const TopicInfo &a, const TopicInfo &b) {
-    return a.name < b.name;
+  bool operator()(const TopicData &a, const TopicData &b) {
+    return a.topic < b.topic;
   }
 };
   
@@ -126,20 +119,20 @@ struct PluginGroup {
   QMap<QString, Info> plugins;
 };
 
-void getPluginGroups( const QMap<QString, QString> &datatype_plugins,
+void getPluginGroups( Ros2DaemonClient& client,
+		      const QMap<QString, QString> &datatype_plugins,
                       QList<PluginGroup> *groups,
-                      QList<TopicInfo> *unvisualizable )
+                      QList<TopicData> *unvisualizable )
 {
   // TODO: need a way to get list of active ROS topics
-  V_TopicInfo all_topics;
-  getTopics( all_topics );
-  V_TopicInfo::iterator topic_it;
+  TopicDataVector all_topics = client.getTopics();
+  TopicDataVector::const_iterator topic_it;
   std::sort( all_topics.begin(), all_topics.end(), LexicalTopicInfo() );
 
   for ( topic_it = all_topics.begin(); topic_it != all_topics.end(); ++topic_it )
   {
-    QString topic = QString::fromStdString( topic_it->name );
-    QString datatype = QString::fromStdString( topic_it->datatype );
+    QString topic = QString::fromStdString( topic_it->topic );
+    QString datatype = QString::fromStdString( topic_it->type );
 
     if ( datatype_plugins.contains( datatype ) )
     {
@@ -529,8 +522,8 @@ void TopicDisplayWidget::fill( DisplayFactory *factory )
   findPlugins( factory );
 
   QList<PluginGroup> groups;
-  QList<TopicInfo> unvisualizable;
-  getPluginGroups( datatype_plugins_, &groups, &unvisualizable );
+  QList<TopicData> unvisualizable;
+  getPluginGroups( daemon_client_, datatype_plugins_, &groups, &unvisualizable );
 
   // Insert visualizable topics along with their plugins
   QList<PluginGroup>::const_iterator pg_it;
@@ -572,8 +565,8 @@ void TopicDisplayWidget::fill( DisplayFactory *factory )
   // Insert unvisualizable topics
   for ( int i = 0; i < unvisualizable.size(); ++i )
   {
-    const TopicInfo &ti = unvisualizable.at( i );
-    QTreeWidgetItem *item = insertItem( QString::fromStdString( ti.name ),
+    const TopicData &ti = unvisualizable.at( i );
+    QTreeWidgetItem *item = insertItem( QString::fromStdString( ti.topic ),
                                         true );
   }
 

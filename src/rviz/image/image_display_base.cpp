@@ -39,6 +39,10 @@
 
 #include "rviz/image/image_display_base.h"
 
+
+using namespace ros2_daemon_client_cpp;
+
+
 namespace rviz
 {
 
@@ -259,10 +263,9 @@ void ImageDisplayBase::fillTransportOptionList(EnumProperty* property)
   choices.push_back("raw");
 
   // Loop over all current ROS topic names
-  ros::master::V_TopicInfo topics;
-  ros::master::getTopics(topics);
-  ros::master::V_TopicInfo::iterator it = topics.begin();
-  ros::master::V_TopicInfo::iterator end = topics.end();
+  TopicDataVector topics = daemon_client_.getTopics();
+  TopicDataVector::const_iterator it = topics.begin();
+  TopicDataVector::const_iterator end = topics.end();
   for (; it != end; ++it)
   {
     // If the beginning of this topic name is the same as topic_,
@@ -270,8 +273,8 @@ void ImageDisplayBase::fillTransportOptionList(EnumProperty* property)
     // and the next character is /
     // and there are no further slashes from there to the end,
     // then consider this a possible transport topic.
-    const ros::master::TopicInfo& ti = *it;
-    const std::string& topic_name = ti.name;
+    const TopicData& ti = *it;
+    const std::string& topic_name = ti.topic;
     const std::string& topic = topic_property_->getStdString();
 
     if (topic_name.find(topic) == 0 && topic_name != topic && topic_name[topic.size()] == '/'

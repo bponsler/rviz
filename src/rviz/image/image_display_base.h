@@ -39,6 +39,8 @@
 # include <image_transport/image_transport.h>
 # include <image_transport/subscriber_filter.h>
 
+#include <ros2_daemon_client_cpp/Ros2DaemonClient.hpp>
+
 # include "rviz/display_context.h"
 # include "rviz/frame_manager.h"
 # include "rviz/properties/ros_topic_property.h"
@@ -126,6 +128,9 @@ protected:
   std::set<std::string> transport_plugin_types_;
 
   BoolProperty* unreliable_property_;
+
+  /** Client to the ROS 2 daemon */
+  ros2_daemon_client_cpp::Ros2DaemonClient daemon_client_;
 };
 
 } // end namespace rviz

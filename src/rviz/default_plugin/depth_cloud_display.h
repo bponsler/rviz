@@ -40,7 +40,8 @@
 # include <message_filters/subscriber.h>
 # include <message_filters/synchronizer.h>
 # include <message_filters/sync_policies/approximate_time.h>
-# include <tf2_ros/message_filter.h>
+
+#include <ros2_daemon_client_cpp/Ros2DaemonClient.hpp>
 
 # include "rviz/properties/enum_property.h"
 # include "rviz/properties/float_property.h"
@@ -218,6 +219,8 @@ protected:
 
   std::set<std::string> transport_plugin_types_;
 
+  /** Client to the ROS 2 daemon */
+  ros2_daemon_client_cpp::Ros2DaemonClient daemon_client_;
 };
 
 

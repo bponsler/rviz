@@ -61,6 +61,7 @@
 #include <math.h>
 
 namespace enc = sensor_msgs::image_encodings;
+using namespace ros2_daemon_client_cpp;
 
 namespace rviz
 {
@@ -90,7 +91,7 @@ DepthCloudDisplay::DepthCloudDisplay()
 
   depth_topic_property_ = new RosFilteredTopicProperty("Depth Map Topic",
                                                        "",
-                                                       QString::fromStdString(ros::message_traits::datatype<sensor_msgs::Image>()),
+                                                       QString::fromStdString("sensor_msgs/Image"),
                                                        "sensor_msgs::Image topic to subscribe to.",
                                                        depth_filter,
                                                        this,
@@ -108,7 +109,7 @@ DepthCloudDisplay::DepthCloudDisplay()
 
   color_topic_property_ = new RosFilteredTopicProperty("Color Image Topic",
                                                        "",
-                                                       QString::fromStdString(ros::message_traits::datatype<sensor_msgs::Image>()),
+                                                       QString::fromStdString("sensor_msgs/Image"),
                                                        "sensor_msgs::Image topic to subscribe to.",
                                                        color_filter,
                                                        this,
@@ -199,7 +200,7 @@ DepthCloudDisplay::~DepthCloudDisplay()
 void DepthCloudDisplay::setTopic( const QString &topic, const QString &datatype )
 {
   // Copied from ImageDisplayBase::setTopic()
-  if ( datatype == ros::message_traits::datatype<sensor_msgs::Image>() )
+  if ( datatype == "sensor_msgs/Image" )
   {
     depth_transport_property_->setStdString( "raw" );
     depth_topic_property_->setString( topic );
@@ -323,8 +324,8 @@ void DepthCloudDisplay::subscribe()
 
         // connect message filters to synchronizer
         sync_depth_color_->connectInput(*depthmap_tf_filter_, *rgb_sub_);
-        sync_depth_color_->setInterMessageLowerBound(0, ros::Duration(0.5));
-        sync_depth_color_->setInterMessageLowerBound(1, ros::Duration(0.5));
+        sync_depth_color_->setInterMessageLowerBound(0, tf2::durationFromSec(0.5));
+        sync_depth_color_->setInterMessageLowerBound(1, tf2::durationFromSec(0.5));
         sync_depth_color_->registerCallback(std::bind(&DepthCloudDisplay::processMessage, this, std::placeholders::_1, std::placeholders::_2));
 
         pointcloud_common_->color_transformer_property_->setValue("RGB8");
@@ -335,7 +336,7 @@ void DepthCloudDisplay::subscribe()
 
     }
   }
-  catch (ros::Exception& e)
+  catch (rclcpp::exceptions::RCLError& e)
   {
     setStatus( StatusProperty::Error, "Message", QString("Error subscribing: ") + e.what() );
   }
@@ -364,7 +365,7 @@ void DepthCloudDisplay::unsubscribe()
     rgb_sub_.reset();
     cam_info_sub_.reset();
   }
-  catch (ros::Exception& e)
+  catch (rclcpp::exceptions::RCLError& e)
   {
     setStatus( StatusProperty::Error, "Message", QString("Error unsubscribing: ") + e.what() );
   }
@@ -570,10 +571,9 @@ void DepthCloudDisplay::fillTransportOptionList(EnumProperty* property)
   choices.push_back("raw");
 
   // Loop over all current ROS topic names
-  ros::master::V_TopicInfo topics;
-  ros::master::getTopics(topics);
-  ros::master::V_TopicInfo::iterator it = topics.begin();
-  ros::master::V_TopicInfo::iterator end = topics.end();
+  TopicDataVector topics = daemon_client_.getTopics();
+  TopicDataVector::const_iterator it = topics.begin();
+  TopicDataVector::const_iterator end = topics.end();
   for (; it != end; ++it)
   {
     // If the beginning of this topic name is the same as topic_,
@@ -581,8 +581,8 @@ void DepthCloudDisplay::fillTransportOptionList(EnumProperty* property)
     // and the next character is /
     // and there are no further slashes from there to the end,
     // then consider this a possible transport topic.
-    const ros::master::TopicInfo& ti = *it;
-    const std::string& topic_name = ti.name;
+    const TopicData& ti = *it;
+    const std::string& topic_name = ti.topic;
     const std::string& topic = depth_topic_property_->getStdString();
 
     if (topic_name.find(topic) == 0 && topic_name != topic && topic_name[topic.size()] == '/'

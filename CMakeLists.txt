@@ -32,6 +32,7 @@ find_package(urdf REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(X11 REQUIRED)
+find_package(ros2_daemon_client_cpp)
 
 if(POLICY CMP0042)
   cmake_policy(SET CMP0042 NEW)
@@ -177,6 +178,7 @@ set(INCLUDE_DIRS src ${ament_cmake_INCLUDE_DIRS} ${angles_INCLUDE_DIRS}
   ${visualization_msgs_INCLUDE_DIRS} ${pluginlib_INCLUDE_DIRS} ${OGRE_OV_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS} ${Qt5Gui_OPENGL_INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS}
   ${Qt5OpenGL_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIRS} ${X11_INCLUDE_DIRS}
+  ${ros2_daemon_client_cpp_INCLUDE_DIRS}
 )
 include_directories(${INCLUDE_DIRS})
 
@@ -193,6 +195,7 @@ set(LIBRARY_DIRS ${ament_cmake_LIBRARY_DIRS} ${angles_LIBRARY_DIRS}
   ${visualization_msgs_LIBRARY_DIRS} ${pluginlib_LIBRARY_DIRS} ${OGRE_OV_LIBRARY_DIRS}
   ${Boost_LIBRARY_DIRS} ${Qt5Gui_OPENGL_LIBRARY_DIRS} ${Qt5Widgets_LIBRARY_DIRS}
   ${Qt5OpenGL_LIBRARY_DIRS} ${EIGEN3_LIBRARY_DIRS} ${X11_LIBRARY_DIRS}
+  ${ros2_daemon_client_cpp_LIBRARY_DIRS}
 )
 
 link_directories(${LIBRARY_DIRS})
@@ -209,6 +212,7 @@ set(LIBS ${ament_cmake_LIBRARIES} ${angles_LIBRARIES} ${cmake_modules_LIBRARIES}
   ${visualization_msgs_LIBRARIES} ${pluginlib_LIBRARIES} ${OGRE_OV_LIBRARIES}
   ${Boost_LIBRARIES} ${Qt5Gui_OPENGL_LIBRARIES} ${Qt5Widgets_LIBRARIES}
   ${Qt5OpenGL_LIBRARIES} ${EIGEN3_LIBRARIES} ${X11_LIBRARIES}
+  ${ros2_daemon_client_cpp_LIBRARIES}
 )
 
 # This variable controls the target name of the default plugin library.
@@ -259,6 +263,7 @@ ament_export_dependencies(urdf)
 ament_export_dependencies(visualization_msgs)
 ament_export_dependencies(pluginlib)
 ament_export_dependencies(X11)
+ament_export_dependencies(ros2_daemon_client_cpp)
 ament_export_include_directories(${INCLUDE_DIRS})
 
 ament_package()

@@ -33,6 +33,8 @@
 
 #include "rviz/properties/editable_enum_property.h"
 
+#include <ros2_daemon_client_cpp/Ros2DaemonClient.hpp>
+
 namespace rviz
 {
 
@@ -59,6 +61,9 @@ protected Q_SLOTS:
 
 private:
   QString message_type_;
+
+  /** Client to the ROS 2 daemon */
+  ros2_daemon_client_cpp::Ros2DaemonClient daemon_client_;
 };
 
 } // end namespace rviz
